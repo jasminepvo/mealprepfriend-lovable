@@ -21,7 +21,9 @@ const CookGuide = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background px-6 py-8 pb-28">
+    <div className="min-h-screen bg-background">
+      <AppHeader />
+      <div className="px-6 py-8 pb-28">
       <h1 className="text-3xl font-bold text-foreground mb-1">Your Cook Day 🗓️</h1>
       <p className="text-muted-foreground mb-4">Follow these steps to prep everything in ~{hours}h {mins > 0 ? `${mins}m` : ""}</p>
 
