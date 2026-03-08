@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMealPrep } from "@/context/MealPrepContext";
+import AppHeader from "@/components/AppHeader";
 
 const mealOptions = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
