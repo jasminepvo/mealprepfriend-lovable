@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMealPrep } from "@/context/MealPrepContext";
 import { supabase } from "@/integrations/supabase/client";
+import AppHeader from "@/components/AppHeader";
 
 interface GroceryItem {
   name: string;
