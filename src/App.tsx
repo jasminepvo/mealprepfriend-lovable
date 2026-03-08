@@ -12,6 +12,7 @@ import FoodPicks from "./pages/FoodPicks";
 import MealPlan from "./pages/MealPlan";
 import CookGuide from "./pages/CookGuide";
 import GroceryList from "./pages/GroceryList";
+import Preferences from "./pages/Preferences";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
