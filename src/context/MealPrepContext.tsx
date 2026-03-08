@@ -40,15 +40,34 @@ export interface CookStep {
   parallel_tip: string;
 }
 
+export interface GroceryItem {
+  name: string;
+  quantity: string;
+  estimated_price: number;
+}
+
+export interface GroceryCategory {
+  name: string;
+  emoji: string;
+  items: GroceryItem[];
+}
+
+export interface GroceryData {
+  categories: GroceryCategory[];
+  estimated_total: number;
+}
+
 interface MealPrepState {
   profile: UserProfile | null;
   preferences: Preferences | null;
   mealPlan: DayPlan[] | null;
   cookGuide: CookStep[] | null;
+  groceryList: GroceryData | null;
   setProfile: (p: UserProfile) => void;
   setPreferences: (p: Preferences) => void;
   setMealPlan: (mp: DayPlan[]) => void;
   setCookGuide: (cg: CookStep[]) => void;
+  setGroceryList: (gl: GroceryData) => void;
   reset: () => void;
 }
 
@@ -59,16 +78,18 @@ export const MealPrepProvider = ({ children }: { children: ReactNode }) => {
   const [preferences, setPreferences] = useState<Preferences | null>(null);
   const [mealPlan, setMealPlan] = useState<DayPlan[] | null>(null);
   const [cookGuide, setCookGuide] = useState<CookStep[] | null>(null);
+  const [groceryList, setGroceryList] = useState<GroceryData | null>(null);
 
   const reset = () => {
     setProfile(null);
     setPreferences(null);
     setMealPlan(null);
     setCookGuide(null);
+    setGroceryList(null);
   };
 
   return (
-    <MealPrepContext.Provider value={{ profile, preferences, mealPlan, cookGuide, setProfile, setPreferences, setMealPlan, setCookGuide, reset }}>
+    <MealPrepContext.Provider value={{ profile, preferences, mealPlan, cookGuide, groceryList, setProfile, setPreferences, setMealPlan, setCookGuide, setGroceryList, reset }}>
       {children}
     </MealPrepContext.Provider>
   );
