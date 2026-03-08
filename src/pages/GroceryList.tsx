@@ -100,7 +100,9 @@ const GroceryList = () => {
   if (!groceryList) return null;
 
   return (
-    <div className="min-h-screen bg-background px-6 py-8 pb-28">
+    <div className="min-h-screen bg-background">
+      <AppHeader />
+      <div className="px-6 py-8 pb-28">
       <h1 className="text-3xl font-bold text-foreground mb-1">Grocery List 🛒</h1>
       <p className="text-muted-foreground mb-2">
         {checkedCount} of {totalItems} items checked
