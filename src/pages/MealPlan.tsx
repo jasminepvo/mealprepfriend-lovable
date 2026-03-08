@@ -168,7 +168,7 @@ const MealPlan = () => {
                         </div>
                       ) : (
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground text-sm truncate">{meal.name}</p>
+                          <p className="font-medium text-foreground text-sm break-words">{meal.name}</p>
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <span className="text-xs text-muted-foreground">{meal.calories} cal</span>
                             <span className="rounded-full bg-secondary/30 px-2 py-0.5 text-xs text-foreground">P {meal.protein_g}g</span>
