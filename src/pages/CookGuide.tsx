@@ -67,6 +67,7 @@ const CookGuide = () => {
         </button>
       </div>
     </div>
+    </div>
   );
 };
 

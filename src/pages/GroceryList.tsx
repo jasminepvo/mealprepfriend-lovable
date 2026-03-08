@@ -181,6 +181,7 @@ const GroceryList = () => {
         </button>
       </div>
     </div>
+    </div>
   );
 };
 

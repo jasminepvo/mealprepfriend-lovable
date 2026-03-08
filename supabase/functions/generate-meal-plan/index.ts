@@ -9,9 +9,19 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { protein, carb, veggie, fat, mealsSelected, calories, proteinPct, carbPct, fatPct, budget } = await req.json();
+    const { protein, carb, veggie, fat, mealsSelected, calories, proteinPct, carbPct, fatPct, budget, foodAvoidances, householdSize } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const avoidanceText = foodAvoidances && foodAvoidances.length > 0
+      ? `\n- STRICTLY avoid these ingredients and anything containing them: ${foodAvoidances.join(", ")}`
+      : "";
+
+    const householdText = householdSize === "me_plus_1"
+      ? "\n- Scale all portions for 2 people"
+      : householdSize === "family"
+      ? "\n- Scale all portions for a family of 3-4 people"
+      : "\n- Portions for 1 person";
 
     const systemPrompt = `You are a meal prep expert helping busy women meal prep a week of healthy food in one Sunday cooking session. Generate a 7-day meal plan and a Sunday cook guide.
 
@@ -24,7 +34,7 @@ Rules:
 - Western meals only
 - Make meals simple and batch-friendly for Sunday prep
 - The cook guide should have steps that can be completed in about 3 hours total
-- Include parallel tips so the user can multitask efficiently`;
+- Include parallel tips so the user can multitask efficiently${avoidanceText}${householdText}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
