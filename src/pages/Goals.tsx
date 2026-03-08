@@ -66,7 +66,7 @@ const Goals = () => {
       carbPct: 40,
       fatPct: 30,
     });
-    navigate("/food-picks");
+    navigate("/preferences");
   };
 
   return (
