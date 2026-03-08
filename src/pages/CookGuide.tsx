@@ -49,10 +49,16 @@ const CookGuide = () => {
         ))}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border px-6 py-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border px-6 py-4 flex gap-3">
+        <button
+          onClick={() => navigate("/meal-plan")}
+          className="flex-1 rounded-lg border-2 border-border px-4 py-3 text-sm font-semibold text-foreground active:scale-[0.98] transition-transform"
+        >
+          ← Meal Plan
+        </button>
         <button
           onClick={handleStartOver}
-          className="w-full rounded-lg bg-muted px-6 py-4 text-lg font-semibold text-foreground active:scale-[0.98] transition-transform"
+          className="flex-1 rounded-lg bg-muted px-4 py-3 text-sm font-semibold text-foreground active:scale-[0.98] transition-transform"
         >
           Start Over
         </button>
