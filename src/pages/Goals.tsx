@@ -161,6 +161,7 @@ const Goals = () => {
         </div>
       )}
     </div>
+    </div>
   );
 };
 

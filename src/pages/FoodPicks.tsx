@@ -220,6 +220,7 @@ const FoodPicks = () => {
         </button>
       </div>
     </div>
+    </div>
   );
 };
 
