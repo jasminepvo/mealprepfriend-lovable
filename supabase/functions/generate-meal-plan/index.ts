@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { protein, carb, veggie, fat, mealsSelected, calories, proteinPct, carbPct, fatPct, budget, foodAvoidances, householdSize } = await req.json();
+    const { protein, carb, veggie, fat, mealsSelected, calories, proteinPct, carbPct, fatPct, budget, foodAvoidances, householdSize, keepMeals } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -23,6 +23,24 @@ serve(async (req) => {
       ? "\n- Scale all portions for a family of 3-4 people"
       : "\n- Portions for 1 person";
 
+    // Build keep-meals instruction if user locked some meals
+    let keepMealsText = "";
+    if (keepMeals && keepMeals.length > 0) {
+      const grouped: Record<string, Array<{ mealIndex: number; meal: any }>> = {};
+      for (const km of keepMeals) {
+        if (!grouped[km.day]) grouped[km.day] = [];
+        grouped[km.day].push({ mealIndex: km.mealIndex, meal: km.meal });
+      }
+      keepMealsText = `\n\nIMPORTANT — LOCKED MEALS:
+The user has locked certain meals that MUST remain EXACTLY as provided below. Do NOT regenerate or modify these meals.
+Only generate new meals for the UNLOCKED slots. Place the locked meals at their exact indices.
+
+Locked meals by day:
+${JSON.stringify(grouped, null, 2)}
+
+For each day, if a meal index is locked, output that exact meal object unchanged. Only generate fresh meals for the remaining indices.`;
+    }
+
     const systemPrompt = `You are a meal prep expert helping busy women meal prep a week of healthy food in one Sunday cooking session. Generate a 7-day meal plan and a Sunday cook guide.
 
 Rules:
@@ -34,7 +52,7 @@ Rules:
 - Western meals only
 - Make meals simple and batch-friendly for Sunday prep
 - The cook guide should have steps that can be completed in about 3 hours total
-- Include parallel tips so the user can multitask efficiently${avoidanceText}${householdText}`;
+- Include parallel tips so the user can multitask efficiently${avoidanceText}${householdText}${keepMealsText}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -130,6 +148,29 @@ Rules:
     if (!toolCall) throw new Error("No tool call in response");
 
     const args = JSON.parse(toolCall.function.arguments);
+
+    // Merge locked meals back to guarantee they're untouched
+    if (keepMeals && keepMeals.length > 0) {
+      const lockedByDay: Record<string, Record<number, any>> = {};
+      for (const km of keepMeals) {
+        if (!lockedByDay[km.day]) lockedByDay[km.day] = {};
+        lockedByDay[km.day][km.mealIndex] = km.meal;
+      }
+
+      for (const dayPlan of args.meal_plan) {
+        const locked = lockedByDay[dayPlan.day];
+        if (locked) {
+          for (const [idxStr, meal] of Object.entries(locked)) {
+            const idx = parseInt(idxStr);
+            // Ensure array is long enough
+            while (dayPlan.meals.length <= idx) {
+              dayPlan.meals.push(dayPlan.meals[dayPlan.meals.length - 1] || meal);
+            }
+            dayPlan.meals[idx] = meal;
+          }
+        }
+      }
+    }
 
     return new Response(JSON.stringify(args), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
