@@ -9,6 +9,7 @@ import Goals from "./pages/Goals";
 import FoodPicks from "./pages/FoodPicks";
 import MealPlan from "./pages/MealPlan";
 import CookGuide from "./pages/CookGuide";
+import GroceryList from "./pages/GroceryList";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/goals" element={<Goals />} />
             <Route path="/food-picks" element={<FoodPicks />} />
             <Route path="/meal-plan" element={<MealPlan />} />
+            <Route path="/grocery-list" element={<GroceryList />} />
             <Route path="/cook-guide" element={<CookGuide />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

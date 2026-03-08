@@ -115,12 +115,18 @@ const MealPlan = () => {
         ))}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border px-6 py-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border px-6 py-4 flex gap-3">
+        <button
+          onClick={() => navigate("/grocery-list")}
+          className="flex-1 rounded-lg border-2 border-primary px-4 py-3 text-sm font-semibold text-primary active:scale-[0.98] transition-transform"
+        >
+          🛒 Grocery List
+        </button>
         <button
           onClick={() => navigate("/cook-guide")}
-          className="w-full rounded-lg bg-primary px-6 py-4 text-lg font-semibold text-primary-foreground shadow-md active:scale-[0.98] transition-transform"
+          className="flex-1 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-md active:scale-[0.98] transition-transform"
         >
-          See Sunday Cook Guide →
+          Cook Guide →
         </button>
       </div>
     </div>

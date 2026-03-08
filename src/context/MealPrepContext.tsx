@@ -83,7 +83,7 @@ export const MealPrepProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <MealPrepContext.Provider value={{ profile, preferences, mealPlan, cookGuide, setProfile, setPreferences, setMealPlan, setCookGuide, reset }}>
+    <MealPrepContext.Provider value={{ profile, preferences, mealPlan, cookGuide, groceryList, setProfile, setPreferences, setMealPlan, setCookGuide, setGroceryList, reset }}>
       {children}
     </MealPrepContext.Provider>
   );
