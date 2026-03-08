@@ -34,6 +34,12 @@ export interface DayPlan {
   meals: Meal[];
 }
 
+export interface CookStep {
+  task: string;
+  duration_min: number;
+  parallel_tip: string;
+}
+
 export interface GroceryItem {
   name: string;
   quantity: string;
