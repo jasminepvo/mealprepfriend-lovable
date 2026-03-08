@@ -71,7 +71,7 @@ const Goals = () => {
 
   return (
     <div className="min-h-screen bg-background px-6 py-8">
-      <p className="text-sm font-medium text-muted-foreground mb-2">Step 1 of 2</p>
+      <p className="text-sm font-medium text-muted-foreground mb-2">Step 1 of 3</p>
       <h1 className="text-3xl font-bold text-foreground mb-8">Tell us about you</h1>
 
       <div className="space-y-6 mb-8">

@@ -118,7 +118,7 @@ const FoodPicks = () => {
 
   return (
     <div className="min-h-screen bg-background px-6 py-8 pb-32">
-      <p className="text-sm font-medium text-muted-foreground mb-2">Step 2 of 2</p>
+      <p className="text-sm font-medium text-muted-foreground mb-2">Step 3 of 3</p>
       <h1 className="text-3xl font-bold text-foreground mb-8">What do you want to eat?</h1>
 
       {/* Meals */}
