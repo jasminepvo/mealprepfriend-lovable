@@ -49,10 +49,18 @@ const Auth = () => {
     const { error } = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
-    if (error) {
+    if (error && !error.message?.toLowerCase().includes("cancel")) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <span className="text-4xl animate-pulse">🥗</span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
