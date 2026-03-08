@@ -5,12 +5,18 @@ import { useMealPrep } from "@/context/MealPrepContext";
 const mealOptions = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
 const proteinOptions = [
-  { emoji: "🐔", label: "Chicken" },
-  { emoji: "🐟", label: "Fish" },
+  { emoji: "🐔", label: "Chicken Breast" },
+  { emoji: "🍗", label: "Chicken Thigh" },
+  { emoji: "🐟", label: "Salmon" },
+  { emoji: "🐠", label: "Tilapia" },
+  { emoji: "🦐", label: "Shrimp" },
   { emoji: "🥩", label: "Steak" },
   { emoji: "🫙", label: "Ground Beef" },
   { emoji: "🦃", label: "Ground Turkey" },
   { emoji: "🥚", label: "Eggs" },
+  { emoji: "🫘", label: "Black Beans" },
+  { emoji: "🧆", label: "Chickpeas" },
+  { emoji: "🥓", label: "Turkey Bacon" },
 ];
 
 const carbOptions = [
@@ -18,7 +24,12 @@ const carbOptions = [
   { emoji: "🍠", label: "Sweet Potato" },
   { emoji: "🍚", label: "White Rice" },
   { emoji: "🍚", label: "Brown Rice" },
+  { emoji: "🍝", label: "Pasta" },
   { emoji: "🌽", label: "Corn" },
+  { emoji: "🫓", label: "Tortillas" },
+  { emoji: "🥖", label: "Bread" },
+  { emoji: "🥣", label: "Oats" },
+  { emoji: "🫘", label: "Quinoa" },
 ];
 
 const veggieOptions = [
@@ -27,6 +38,13 @@ const veggieOptions = [
   { emoji: "🫛", label: "Green Beans" },
   { emoji: "🥬", label: "Spinach" },
   { emoji: "🫑", label: "Bell Pepper" },
+  { emoji: "🥒", label: "Zucchini" },
+  { emoji: "🍅", label: "Tomato" },
+  { emoji: "🧅", label: "Onion" },
+  { emoji: "🍄", label: "Mushroom" },
+  { emoji: "🥗", label: "Mixed Greens" },
+  { emoji: "🌶️", label: "Jalapeño" },
+  { emoji: "🥬", label: "Cabbage" },
 ];
 
 const fatOptions = [
@@ -70,9 +88,13 @@ const FoodPicks = () => {
   const navigate = useNavigate();
   const { setPreferences } = useMealPrep();
   const [meals, setMeals] = useState<string[]>([]);
-  const [protein, setProtein] = useState("");
-  const [carb, setCarb] = useState("");
-  const [veggie, setVeggie] = useState("");
+  const [proteins, setProteins] = useState<string[]>([]);
+  const [carbs, setCarbs] = useState<string[]>([]);
+  const [veggies, setVeggies] = useState<string[]>([]);
+
+  const toggleSelection = (list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
+    setList((prev) => prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]);
+  };
   const [fat, setFat] = useState("");
   const [budget, setBudget] = useState("");
 
@@ -80,14 +102,14 @@ const FoodPicks = () => {
     setMeals((prev) => prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
   };
 
-  const isValid = meals.length >= 2 && protein && carb && veggie && fat && budget;
+  const isValid = meals.length >= 2 && proteins.length >= 1 && carbs.length >= 1 && veggies.length >= 1 && fat && budget;
 
   const handleGenerate = () => {
     setPreferences({
       mealsSelected: meals,
-      protein,
-      carb,
-      veggie,
+      protein: proteins.join(", "),
+      carb: carbs.join(", "),
+      veggie: veggies.join(", "),
       fat,
       weeklyBudget: budget,
     });
@@ -122,30 +144,33 @@ const FoodPicks = () => {
 
       {/* Protein */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your protein</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your proteins</h2>
+        <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
         <div className="grid grid-cols-2 gap-2">
           {proteinOptions.map((o) => (
-            <RadioCard key={o.label} {...o} selected={protein === o.label} onSelect={() => setProtein(o.label)} />
+            <RadioCard key={o.label} {...o} selected={proteins.includes(o.label)} onSelect={() => toggleSelection(proteins, setProteins, o.label)} />
           ))}
         </div>
       </section>
 
       {/* Carb */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your carb</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your carbs</h2>
+        <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
         <div className="grid grid-cols-2 gap-2">
           {carbOptions.map((o) => (
-            <RadioCard key={o.label} {...o} selected={carb === o.label} onSelect={() => setCarb(o.label)} />
+            <RadioCard key={o.label} {...o} selected={carbs.includes(o.label)} onSelect={() => toggleSelection(carbs, setCarbs, o.label)} />
           ))}
         </div>
       </section>
 
       {/* Veggie */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your veggie</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your veggies</h2>
+        <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
         <div className="grid grid-cols-2 gap-2">
           {veggieOptions.map((o) => (
-            <RadioCard key={o.label} {...o} selected={veggie === o.label} onSelect={() => setVeggie(o.label)} />
+            <RadioCard key={o.label} {...o} selected={veggies.includes(o.label)} onSelect={() => toggleSelection(veggies, setVeggies, o.label)} />
           ))}
         </div>
       </section>
