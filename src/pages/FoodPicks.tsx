@@ -102,14 +102,14 @@ const FoodPicks = () => {
     setMeals((prev) => prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
   };
 
-  const isValid = meals.length >= 2 && protein && carb && veggie && fat && budget;
+  const isValid = meals.length >= 2 && proteins.length >= 1 && carbs.length >= 1 && veggies.length >= 1 && fat && budget;
 
   const handleGenerate = () => {
     setPreferences({
       mealsSelected: meals,
-      protein,
-      carb,
-      veggie,
+      protein: proteins.join(", "),
+      carb: carbs.join(", "),
+      veggie: veggies.join(", "),
       fat,
       weeklyBudget: budget,
     });
