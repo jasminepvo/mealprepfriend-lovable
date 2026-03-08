@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMealPrep, DayPlan, CookStep } from "@/context/MealPrepContext";
 import { supabase } from "@/integrations/supabase/client";
+import AppHeader from "@/components/AppHeader";
 
 const dayColors = [
   "bg-warm-peach",
