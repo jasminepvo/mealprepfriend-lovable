@@ -72,12 +72,14 @@ export const MealPrepProvider = ({ children }: { children: ReactNode }) => {
   const [preferences, setPreferences] = useState<Preferences | null>(null);
   const [mealPlan, setMealPlan] = useState<DayPlan[] | null>(null);
   const [cookGuide, setCookGuide] = useState<CookStep[] | null>(null);
+  const [groceryList, setGroceryList] = useState<GroceryData | null>(null);
 
   const reset = () => {
     setProfile(null);
     setPreferences(null);
     setMealPlan(null);
     setCookGuide(null);
+    setGroceryList(null);
   };
 
   return (
