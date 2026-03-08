@@ -16,7 +16,7 @@ const dayColors = [
 
 const MealPlan = () => {
   const navigate = useNavigate();
-  const { profile, preferences, mealPlan, setMealPlan, setCookGuide } = useMealPrep();
+  const { profile, preferences, mealPlan, setMealPlan, setCookGuide, foodAvoidances, householdSize } = useMealPrep();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
