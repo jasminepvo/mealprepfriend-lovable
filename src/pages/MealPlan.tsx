@@ -90,7 +90,9 @@ const MealPlan = () => {
   if (!mealPlan) return null;
 
   return (
-    <div className="min-h-screen bg-background px-6 py-8 pb-28">
+    <div className="min-h-screen bg-background">
+      <AppHeader />
+      <div className="px-6 py-8 pb-28">
       <h1 className="text-3xl font-bold text-foreground mb-1">Your Week 🎉</h1>
       <p className="text-muted-foreground mb-6">Tap any meal to see details</p>
 
