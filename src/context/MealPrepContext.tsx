@@ -63,11 +63,15 @@ interface MealPrepState {
   mealPlan: DayPlan[] | null;
   cookGuide: CookStep[] | null;
   groceryList: GroceryData | null;
+  foodAvoidances: string[];
+  householdSize: string;
   setProfile: (p: UserProfile) => void;
   setPreferences: (p: Preferences) => void;
   setMealPlan: (mp: DayPlan[]) => void;
   setCookGuide: (cg: CookStep[]) => void;
   setGroceryList: (gl: GroceryData) => void;
+  setFoodAvoidances: (fa: string[]) => void;
+  setHouseholdSize: (hs: string) => void;
   reset: () => void;
 }
 
