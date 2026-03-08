@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MealPrepProvider } from "@/context/MealPrepContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Auth from "./pages/Auth";
 import Welcome from "./pages/Welcome";
 import Goals from "./pages/Goals";
 import FoodPicks from "./pages/FoodPicks";
@@ -22,12 +24,13 @@ const App = () => (
       <MealPrepProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Welcome />} />
-            <Route path="/goals" element={<Goals />} />
-            <Route path="/food-picks" element={<FoodPicks />} />
-            <Route path="/meal-plan" element={<MealPlan />} />
-            <Route path="/grocery-list" element={<GroceryList />} />
-            <Route path="/cook-guide" element={<CookGuide />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
+            <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
+            <Route path="/food-picks" element={<ProtectedRoute><FoodPicks /></ProtectedRoute>} />
+            <Route path="/meal-plan" element={<ProtectedRoute><MealPlan /></ProtectedRoute>} />
+            <Route path="/grocery-list" element={<ProtectedRoute><GroceryList /></ProtectedRoute>} />
+            <Route path="/cook-guide" element={<ProtectedRoute><CookGuide /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
