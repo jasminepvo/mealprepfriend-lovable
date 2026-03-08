@@ -48,6 +48,8 @@ const MealPlan = () => {
           carbPct: profile.carbPct,
           fatPct: profile.fatPct,
           budget: preferences.weeklyBudget,
+          foodAvoidances,
+          householdSize,
         },
       });
 
