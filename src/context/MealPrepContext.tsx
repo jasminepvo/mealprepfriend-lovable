@@ -34,10 +34,21 @@ export interface DayPlan {
   meals: Meal[];
 }
 
-export interface CookStep {
-  task: string;
-  duration_min: number;
-  parallel_tip: string;
+export interface GroceryItem {
+  name: string;
+  quantity: string;
+  estimated_price: number;
+}
+
+export interface GroceryCategory {
+  name: string;
+  emoji: string;
+  items: GroceryItem[];
+}
+
+export interface GroceryData {
+  categories: GroceryCategory[];
+  estimated_total: number;
 }
 
 interface MealPrepState {
@@ -45,10 +56,12 @@ interface MealPrepState {
   preferences: Preferences | null;
   mealPlan: DayPlan[] | null;
   cookGuide: CookStep[] | null;
+  groceryList: GroceryData | null;
   setProfile: (p: UserProfile) => void;
   setPreferences: (p: Preferences) => void;
   setMealPlan: (mp: DayPlan[]) => void;
   setCookGuide: (cg: CookStep[]) => void;
+  setGroceryList: (gl: GroceryData) => void;
   reset: () => void;
 }
 
