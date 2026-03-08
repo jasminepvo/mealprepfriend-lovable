@@ -5,12 +5,18 @@ import { useMealPrep } from "@/context/MealPrepContext";
 const mealOptions = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
 const proteinOptions = [
-  { emoji: "🐔", label: "Chicken" },
-  { emoji: "🐟", label: "Fish" },
+  { emoji: "🐔", label: "Chicken Breast" },
+  { emoji: "🍗", label: "Chicken Thigh" },
+  { emoji: "🐟", label: "Salmon" },
+  { emoji: "🐠", label: "Tilapia" },
+  { emoji: "🦐", label: "Shrimp" },
   { emoji: "🥩", label: "Steak" },
   { emoji: "🫙", label: "Ground Beef" },
   { emoji: "🦃", label: "Ground Turkey" },
   { emoji: "🥚", label: "Eggs" },
+  { emoji: "🫘", label: "Black Beans" },
+  { emoji: "🧆", label: "Chickpeas" },
+  { emoji: "🥓", label: "Turkey Bacon" },
 ];
 
 const carbOptions = [
@@ -18,7 +24,12 @@ const carbOptions = [
   { emoji: "🍠", label: "Sweet Potato" },
   { emoji: "🍚", label: "White Rice" },
   { emoji: "🍚", label: "Brown Rice" },
+  { emoji: "🍝", label: "Pasta" },
   { emoji: "🌽", label: "Corn" },
+  { emoji: "🫓", label: "Tortillas" },
+  { emoji: "🥖", label: "Bread" },
+  { emoji: "🥣", label: "Oats" },
+  { emoji: "🫘", label: "Quinoa" },
 ];
 
 const veggieOptions = [
@@ -27,6 +38,13 @@ const veggieOptions = [
   { emoji: "🫛", label: "Green Beans" },
   { emoji: "🥬", label: "Spinach" },
   { emoji: "🫑", label: "Bell Pepper" },
+  { emoji: "🥒", label: "Zucchini" },
+  { emoji: "🍅", label: "Tomato" },
+  { emoji: "🧅", label: "Onion" },
+  { emoji: "🍄", label: "Mushroom" },
+  { emoji: "🥗", label: "Mixed Greens" },
+  { emoji: "🌶️", label: "Jalapeño" },
+  { emoji: "🥬", label: "Cabbage" },
 ];
 
 const fatOptions = [
