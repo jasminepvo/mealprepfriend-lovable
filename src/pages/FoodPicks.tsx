@@ -88,9 +88,13 @@ const FoodPicks = () => {
   const navigate = useNavigate();
   const { setPreferences } = useMealPrep();
   const [meals, setMeals] = useState<string[]>([]);
-  const [protein, setProtein] = useState("");
-  const [carb, setCarb] = useState("");
-  const [veggie, setVeggie] = useState("");
+  const [proteins, setProteins] = useState<string[]>([]);
+  const [carbs, setCarbs] = useState<string[]>([]);
+  const [veggies, setVeggies] = useState<string[]>([]);
+
+  const toggleSelection = (list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
+    setList((prev) => prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]);
+  };
   const [fat, setFat] = useState("");
   const [budget, setBudget] = useState("");
 
