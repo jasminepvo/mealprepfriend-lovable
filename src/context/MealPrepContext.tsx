@@ -63,11 +63,15 @@ interface MealPrepState {
   mealPlan: DayPlan[] | null;
   cookGuide: CookStep[] | null;
   groceryList: GroceryData | null;
+  foodAvoidances: string[];
+  householdSize: string;
   setProfile: (p: UserProfile) => void;
   setPreferences: (p: Preferences) => void;
   setMealPlan: (mp: DayPlan[]) => void;
   setCookGuide: (cg: CookStep[]) => void;
   setGroceryList: (gl: GroceryData) => void;
+  setFoodAvoidances: (fa: string[]) => void;
+  setHouseholdSize: (hs: string) => void;
   reset: () => void;
 }
 
@@ -79,6 +83,8 @@ export const MealPrepProvider = ({ children }: { children: ReactNode }) => {
   const [mealPlan, setMealPlan] = useState<DayPlan[] | null>(null);
   const [cookGuide, setCookGuide] = useState<CookStep[] | null>(null);
   const [groceryList, setGroceryList] = useState<GroceryData | null>(null);
+  const [foodAvoidances, setFoodAvoidances] = useState<string[]>([]);
+  const [householdSize, setHouseholdSize] = useState("just_me");
 
   const reset = () => {
     setProfile(null);
@@ -86,10 +92,12 @@ export const MealPrepProvider = ({ children }: { children: ReactNode }) => {
     setMealPlan(null);
     setCookGuide(null);
     setGroceryList(null);
+    setFoodAvoidances([]);
+    setHouseholdSize("just_me");
   };
 
   return (
-    <MealPrepContext.Provider value={{ profile, preferences, mealPlan, cookGuide, groceryList, setProfile, setPreferences, setMealPlan, setCookGuide, setGroceryList, reset }}>
+    <MealPrepContext.Provider value={{ profile, preferences, mealPlan, cookGuide, groceryList, foodAvoidances, householdSize, setProfile, setPreferences, setMealPlan, setCookGuide, setGroceryList, setFoodAvoidances, setHouseholdSize, reset }}>
       {children}
     </MealPrepContext.Provider>
   );

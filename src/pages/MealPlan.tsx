@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMealPrep, DayPlan, CookStep } from "@/context/MealPrepContext";
 import { supabase } from "@/integrations/supabase/client";
+import AppHeader from "@/components/AppHeader";
 
 const dayColors = [
   "bg-warm-peach",
@@ -15,7 +16,7 @@ const dayColors = [
 
 const MealPlan = () => {
   const navigate = useNavigate();
-  const { profile, preferences, mealPlan, setMealPlan, setCookGuide } = useMealPrep();
+  const { profile, preferences, mealPlan, setMealPlan, setCookGuide, foodAvoidances, householdSize } = useMealPrep();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -47,6 +48,8 @@ const MealPlan = () => {
           carbPct: profile.carbPct,
           fatPct: profile.fatPct,
           budget: preferences.weeklyBudget,
+          foodAvoidances,
+          householdSize,
         },
       });
 
@@ -87,7 +90,9 @@ const MealPlan = () => {
   if (!mealPlan) return null;
 
   return (
-    <div className="min-h-screen bg-background px-6 py-8 pb-28">
+    <div className="min-h-screen bg-background">
+      <AppHeader />
+      <div className="px-6 py-8 pb-28">
       <h1 className="text-3xl font-bold text-foreground mb-1">Your Week 🎉</h1>
       <p className="text-muted-foreground mb-6">Tap any meal to see details</p>
 
@@ -129,6 +134,7 @@ const MealPlan = () => {
           Cook Guide →
         </button>
       </div>
+    </div>
     </div>
   );
 };

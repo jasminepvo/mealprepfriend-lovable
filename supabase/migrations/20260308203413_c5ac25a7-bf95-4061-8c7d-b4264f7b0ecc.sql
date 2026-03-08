@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN food_avoidances text[] DEFAULT '{}', ADD COLUMN household_size text DEFAULT 'just_me';

@@ -19,6 +19,8 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string | null
+          food_avoidances: string[] | null
+          household_size: string | null
           id: string
           updated_at: string
         }
@@ -26,6 +28,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          food_avoidances?: string[] | null
+          household_size?: string | null
           id: string
           updated_at?: string
         }
@@ -33,6 +37,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          food_avoidances?: string[] | null
+          household_size?: string | null
           id?: string
           updated_at?: string
         }
