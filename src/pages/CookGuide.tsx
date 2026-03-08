@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useMealPrep } from "@/context/MealPrepContext";
+import AppHeader from "@/components/AppHeader";
 
 const CookGuide = () => {
   const navigate = useNavigate();
