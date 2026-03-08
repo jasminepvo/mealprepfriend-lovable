@@ -144,30 +144,33 @@ const FoodPicks = () => {
 
       {/* Protein */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your protein</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your proteins</h2>
+        <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
         <div className="grid grid-cols-2 gap-2">
           {proteinOptions.map((o) => (
-            <RadioCard key={o.label} {...o} selected={protein === o.label} onSelect={() => setProtein(o.label)} />
+            <RadioCard key={o.label} {...o} selected={proteins.includes(o.label)} onSelect={() => toggleSelection(proteins, setProteins, o.label)} />
           ))}
         </div>
       </section>
 
       {/* Carb */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your carb</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your carbs</h2>
+        <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
         <div className="grid grid-cols-2 gap-2">
           {carbOptions.map((o) => (
-            <RadioCard key={o.label} {...o} selected={carb === o.label} onSelect={() => setCarb(o.label)} />
+            <RadioCard key={o.label} {...o} selected={carbs.includes(o.label)} onSelect={() => toggleSelection(carbs, setCarbs, o.label)} />
           ))}
         </div>
       </section>
 
       {/* Veggie */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your veggie</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your veggies</h2>
+        <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
         <div className="grid grid-cols-2 gap-2">
           {veggieOptions.map((o) => (
-            <RadioCard key={o.label} {...o} selected={veggie === o.label} onSelect={() => setVeggie(o.label)} />
+            <RadioCard key={o.label} {...o} selected={veggies.includes(o.label)} onSelect={() => toggleSelection(veggies, setVeggies, o.label)} />
           ))}
         </div>
       </section>
