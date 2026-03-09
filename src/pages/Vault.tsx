@@ -168,7 +168,7 @@ const Vault = () => {
         </SheetContent>
       </Sheet>
 
-      <BottomTabBar />
+      <FloatingTabBar />
     </div>
   );
 };
