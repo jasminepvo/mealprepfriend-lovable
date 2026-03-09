@@ -15,7 +15,6 @@ import {
 import screenshotGoals from "@/assets/screenshot-goals.png";
 import screenshotPreferences from "@/assets/screenshot-preferences.png";
 import screenshotMealplan from "@/assets/screenshot-mealplan.png";
-import screenshotLockregen from "@/assets/screenshot-lockregen.png";
 import screenshotCookguide from "@/assets/screenshot-cookguide.png";
 import screenshotGrocery from "@/assets/screenshot-grocery.png";
 
@@ -35,34 +34,27 @@ const walkthrough = [
   },
   {
     step: 2,
-    title: "Set Preferences",
-    desc: "Mark food avoidances, household size, and dietary style — the AI respects all of it.",
-    emoji: "🧑‍🍳",
+    title: "Pick Your Foods",
+    desc: "Choose which meals to prep, pick your favorite proteins, grains, and veggies — the AI builds around your picks.",
+    emoji: "🥑",
     screenshot: screenshotPreferences,
   },
   {
     step: 3,
-    title: "Your Weekly Meal Plan",
-    desc: "AI generates balanced meals for every day, tailored to your calories, macros, and food picks.",
-    emoji: "📋",
+    title: "Lock & Regenerate",
+    desc: "AI generates balanced meals for every day. Love a meal? Lock it 🔒 and regenerate only the rest.",
+    emoji: "🔄",
     screenshot: screenshotMealplan,
   },
   {
     step: 4,
-    title: "Lock & Regenerate",
-    desc: "Love a meal? Lock it 🔒 and regenerate only the rest — total control over your week.",
-    emoji: "🔄",
-    screenshot: screenshotLockregen,
-  },
-  {
-    step: 5,
     title: "Cook Guide",
     desc: "Step-by-step instructions with timing tips so you can prep everything in one session.",
     emoji: "👨‍🍳",
     screenshot: screenshotCookguide,
   },
   {
-    step: 6,
+    step: 5,
     title: "Grocery List",
     desc: "Auto-generated grocery list grouped by aisle with quantities and estimated cost.",
     emoji: "🛒",
