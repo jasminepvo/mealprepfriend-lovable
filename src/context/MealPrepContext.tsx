@@ -28,6 +28,10 @@ export interface Preferences {
   veggie: string;
   fat: string;
   weeklyBudget: string;
+  cuisinePreferences: string[];
+  complexityLevel: "super_simple" | "home_chef" | "master_chef";
+  biggestMeal: "morning" | "midday" | "evening";
+  healthySwapsEnabled: boolean;
 }
 
 export interface Meal {
