@@ -18,46 +18,106 @@ const activityMultipliers = {
   very_active: 1.725,
 };
 
+function detectDefaultUnit(): "imperial" | "metric" {
+  try {
+    return navigator.language === "en-US" ? "imperial" : "metric";
+  } catch {
+    return "imperial";
+  }
+}
+
 const Goals = () => {
   const navigate = useNavigate();
   const { setProfile } = useMealPrep();
+  const [unit, setUnit] = useState<"imperial" | "metric">(detectDefaultUnit);
   const [sex, setSex] = useState<"female" | "male">("female");
   const [age, setAge] = useState(30);
   const [heightFt, setHeightFt] = useState("");
   const [heightIn, setHeightIn] = useState("");
+  const [heightCmInput, setHeightCmInput] = useState("");
   const [currentWeight, setCurrentWeight] = useState("");
   const [goalWeight, setGoalWeight] = useState("");
   const [activity, setActivity] = useState<keyof typeof activityMultipliers | "">("");
 
-  const canContinue = currentWeight && goalWeight && activity && heightFt && heightIn;
+  const switchUnit = (newUnit: "imperial" | "metric") => {
+    if (newUnit === unit) return;
+
+    if (newUnit === "metric") {
+      // Convert imperial → metric
+      if (currentWeight) setCurrentWeight((parseFloat(currentWeight) / 2.205).toFixed(1));
+      if (goalWeight) setGoalWeight((parseFloat(goalWeight) / 2.205).toFixed(1));
+      if (heightFt || heightIn) {
+        const totalInches = (parseInt(heightFt || "0") * 12) + parseInt(heightIn || "0");
+        setHeightCmInput(Math.round(totalInches * 2.54).toString());
+      }
+    } else {
+      // Convert metric → imperial
+      if (currentWeight) setCurrentWeight((parseFloat(currentWeight) * 2.205).toFixed(1));
+      if (goalWeight) setGoalWeight((parseFloat(goalWeight) * 2.205).toFixed(1));
+      if (heightCmInput) {
+        const totalInches = parseFloat(heightCmInput) / 2.54;
+        setHeightFt(Math.floor(totalInches / 12).toString());
+        setHeightIn(Math.round(totalInches % 12).toString());
+      }
+    }
+    setUnit(newUnit);
+  };
+
+  const canContinue = unit === "imperial"
+    ? currentWeight && goalWeight && activity && heightFt && heightIn
+    : currentWeight && goalWeight && activity && heightCmInput;
 
   const handleNext = () => {
     if (!activity || !canContinue) return;
-    const cw = parseFloat(currentWeight);
-    const gw = parseFloat(goalWeight);
-    const ft = parseInt(heightFt);
-    const inches = parseInt(heightIn);
+    const cwDisplay = parseFloat(currentWeight);
+    const gwDisplay = parseFloat(goalWeight);
 
-    const weightKg = cw * 0.453592;
-    const heightCm = ft * 30.48 + inches * 2.54;
-    const totalInches = ft * 12 + inches;
+    // Always convert to metric for calculations
+    let weightKg: number, goalWeightKg: number, heightCm: number;
+    if (unit === "imperial") {
+      weightKg = cwDisplay * 0.453592;
+      goalWeightKg = gwDisplay * 0.453592;
+      const ft = parseInt(heightFt);
+      const inches = parseInt(heightIn);
+      heightCm = ft * 30.48 + inches * 2.54;
+    } else {
+      weightKg = cwDisplay;
+      goalWeightKg = gwDisplay;
+      heightCm = parseFloat(heightCmInput);
+    }
 
-    // Mifflin-St Jeor
+    // Mifflin-St Jeor (always in metric)
     const bmr = sex === "male"
       ? 10 * weightKg + 6.25 * heightCm - 5 * age + 5
       : 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
 
     const tdee = Math.round(bmr * activityMultipliers[activity]);
-    const bmi = parseFloat(((cw / (totalInches * totalInches)) * 703).toFixed(1));
+    // BMI from metric: kg / (m²)
+    const heightM = heightCm / 100;
+    const bmi = parseFloat((weightKg / (heightM * heightM)).toFixed(1));
 
-    // Default goal/macros will be set on YourGoal screen
+    // Store display values for ft/in (convert from metric if needed)
+    let storeFt: number, storeIn: number;
+    if (unit === "imperial") {
+      storeFt = parseInt(heightFt);
+      storeIn = parseInt(heightIn);
+    } else {
+      const totalIn = heightCm / 2.54;
+      storeFt = Math.floor(totalIn / 12);
+      storeIn = Math.round(totalIn % 12);
+    }
+
+    // Store display weight in lbs for context compatibility
+    const cwLbs = unit === "imperial" ? cwDisplay : cwDisplay * 2.205;
+    const gwLbs = unit === "imperial" ? gwDisplay : gwDisplay * 2.205;
+
     setProfile({
       biologicalSex: sex,
       age,
-      heightFt: ft,
-      heightIn: inches,
-      currentWeight: cw,
-      goalWeight: gw,
+      heightFt: storeFt,
+      heightIn: storeIn,
+      currentWeight: parseFloat(cwLbs.toFixed(1)),
+      goalWeight: parseFloat(gwLbs.toFixed(1)),
       activityLevel: activity,
       bmi,
       bmr: Math.round(bmr),
@@ -67,6 +127,9 @@ const Goals = () => {
       proteinPct: 30,
       carbPct: 40,
       fatPct: 30,
+      unitPreference: unit,
+      weightKg: parseFloat(weightKg.toFixed(2)),
+      heightCm: parseFloat(heightCm.toFixed(1)),
     });
     navigate("/your-goal");
   };
@@ -76,7 +139,33 @@ const Goals = () => {
       <AppHeader />
       <div className="px-6 py-8 pb-28">
         <p className="text-sm font-medium text-muted-foreground mb-2">Step 1 of 3</p>
-        <h1 className="text-3xl font-bold text-foreground mb-8">About You</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-6">About You</h1>
+
+        {/* Unit Toggle */}
+        <section className="mb-8">
+          <div className="grid grid-cols-2 gap-0 rounded-lg border border-border overflow-hidden">
+            <button
+              onClick={() => switchUnit("imperial")}
+              className={`px-4 py-3 text-sm font-semibold transition-colors ${
+                unit === "imperial"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card text-muted-foreground"
+              }`}
+            >
+              🇺🇸 Imperial (lbs, ft/in)
+            </button>
+            <button
+              onClick={() => switchUnit("metric")}
+              className={`px-4 py-3 text-sm font-semibold transition-colors ${
+                unit === "metric"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card text-muted-foreground"
+              }`}
+            >
+              🌍 Metric (kg, cm)
+            </button>
+          </div>
+        </section>
 
         {/* Biological Sex */}
         <section className="mb-8">
@@ -119,58 +208,76 @@ const Goals = () => {
         {/* Height */}
         <section className="mb-8">
           <label className="block text-sm font-medium text-foreground mb-3">Height</label>
-          <div className="grid grid-cols-2 gap-3">
+          {unit === "imperial" ? (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={heightFt}
+                  onChange={(e) => setHeightFt(e.target.value)}
+                  placeholder="ft"
+                  min={3}
+                  max={7}
+                  className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+                <span className="text-xs text-muted-foreground mt-1 block">feet</span>
+              </div>
+              <div>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={heightIn}
+                  onChange={(e) => setHeightIn(e.target.value)}
+                  placeholder="in"
+                  min={0}
+                  max={11}
+                  className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+                <span className="text-xs text-muted-foreground mt-1 block">inches</span>
+              </div>
+            </div>
+          ) : (
             <div>
               <input
                 type="number"
                 inputMode="numeric"
-                value={heightFt}
-                onChange={(e) => setHeightFt(e.target.value)}
-                placeholder="ft"
-                min={3}
-                max={7}
+                value={heightCmInput}
+                onChange={(e) => setHeightCmInput(e.target.value)}
+                placeholder="e.g. 170"
                 className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
-              <span className="text-xs text-muted-foreground mt-1 block">feet</span>
+              <span className="text-xs text-muted-foreground mt-1 block">centimeters</span>
             </div>
-            <div>
-              <input
-                type="number"
-                inputMode="numeric"
-                value={heightIn}
-                onChange={(e) => setHeightIn(e.target.value)}
-                placeholder="in"
-                min={0}
-                max={11}
-                className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-              <span className="text-xs text-muted-foreground mt-1 block">inches</span>
-            </div>
-          </div>
+          )}
         </section>
 
         {/* Weight */}
         <section className="mb-8">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Current weight (lbs)</label>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Current weight ({unit === "imperial" ? "lbs" : "kg"})
+              </label>
               <input
                 type="number"
                 inputMode="numeric"
                 value={currentWeight}
                 onChange={(e) => setCurrentWeight(e.target.value)}
-                placeholder="e.g. 160"
+                placeholder={unit === "imperial" ? "e.g. 160" : "e.g. 72"}
                 className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Goal weight (lbs)</label>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Goal weight ({unit === "imperial" ? "lbs" : "kg"})
+              </label>
               <input
                 type="number"
                 inputMode="numeric"
                 value={goalWeight}
                 onChange={(e) => setGoalWeight(e.target.value)}
-                placeholder="e.g. 140"
+                placeholder={unit === "imperial" ? "e.g. 140" : "e.g. 63"}
                 className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>

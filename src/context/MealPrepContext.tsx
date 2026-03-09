@@ -16,6 +16,9 @@ export interface UserProfile {
   proteinPct: number;
   carbPct: number;
   fatPct: number;
+  unitPreference: "imperial" | "metric";
+  weightKg: number;
+  heightCm: number;
 }
 
 export interface Preferences {

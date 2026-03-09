@@ -47,10 +47,32 @@ const goalOptions = [
 ];
 
 function getBmiCategory(bmi: number) {
-  if (bmi < 18.5) return { label: "Underweight", color: "bg-blue-500" };
-  if (bmi < 25) return { label: "Healthy", color: "bg-green-500" };
-  if (bmi < 30) return { label: "Overweight", color: "bg-yellow-500" };
-  return { label: "Obese", color: "bg-red-500" };
+  if (bmi < 18.5) return {
+    label: "Underweight",
+    pillColor: "bg-blue-500",
+    context: "Your goal weight suggests you want to build more mass — we'll help with that.",
+  };
+  if (bmi < 25) return {
+    label: "Healthy range",
+    pillColor: "bg-green-500",
+    context: "You're in a great place. Let's keep you there.",
+  };
+  if (bmi < 30) return {
+    label: "Overweight",
+    pillColor: "bg-yellow-500",
+    context: "A modest calorie deficit will help you reach your goal gradually and sustainably.",
+  };
+  return {
+    label: "Obese",
+    pillColor: "bg-red-500",
+    context: "Small consistent changes make a big difference. We'll start you with a gentle deficit.",
+  };
+}
+
+function getBmiBarPosition(bmi: number): number {
+  // Map BMI 15–40 to 0–100%
+  const clamped = Math.max(15, Math.min(40, bmi));
+  return ((clamped - 15) / 25) * 100;
 }
 
 function getDefaultGoal(currentWeight: number, goalWeight: number): string {
@@ -64,6 +86,7 @@ const YourGoal = () => {
   const { profile, setProfile } = useMealPrep();
 
   const [selectedGoal, setSelectedGoal] = useState("");
+  const [animateBmi, setAnimateBmi] = useState(false);
 
   useEffect(() => {
     if (!profile) {
@@ -72,6 +95,9 @@ const YourGoal = () => {
     }
     const defaultGoal = getDefaultGoal(profile.currentWeight, profile.goalWeight);
     setSelectedGoal(defaultGoal);
+    // Trigger BMI bar animation after mount
+    const timer = setTimeout(() => setAnimateBmi(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   if (!profile) return null;
@@ -80,6 +106,7 @@ const YourGoal = () => {
   const calorieTarget = currentGoal ? profile.tdee + currentGoal.calorieDelta : profile.tdee;
   const bmiCat = getBmiCategory(profile.bmi);
   const tdeeRounded = Math.round(profile.tdee / 10) * 10;
+  const bmiPosition = getBmiBarPosition(profile.bmi);
 
   const handleContinue = () => {
     if (!currentGoal) return;
@@ -101,24 +128,53 @@ const YourGoal = () => {
         <p className="text-sm font-medium text-muted-foreground mb-2">Step 2 of 3</p>
         <h1 className="text-3xl font-bold text-foreground mb-6">Your Goal</h1>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-3 mb-8">
-          <div className="rounded-xl bg-card border border-border p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">BMI</p>
-            <p className="text-2xl font-bold text-foreground">{profile.bmi}</p>
-            <span className={`inline-block mt-1 rounded-full px-2 py-0.5 text-xs font-medium text-primary-foreground ${bmiCat.color}`}>
-              {bmiCat.label}
-            </span>
+        {/* Grouped Stats Container — Law of Common Region */}
+        <div className="rounded-2xl bg-muted/50 p-4 mb-8 space-y-4">
+          {/* BMI Card — Enhanced */}
+          <div className="rounded-xl bg-card border border-border p-5">
+            <p className="text-xs text-muted-foreground mb-1 text-center">BMI</p>
+            <p className="text-3xl font-bold text-foreground text-center mb-3">{profile.bmi}</p>
+
+            {/* Gradient BMI bar */}
+            <div className="relative h-3 rounded-full overflow-hidden mb-2"
+              style={{
+                background: "linear-gradient(to right, hsl(210, 80%, 60%), hsl(140, 60%, 50%) 30%, hsl(50, 80%, 55%) 60%, hsl(0, 70%, 55%))"
+              }}
+            >
+              {/* Triangle indicator */}
+              <div
+                className="absolute top-0 transition-all duration-700 ease-out"
+                style={{ left: animateBmi ? `${bmiPosition}%` : "0%", transform: "translateX(-50%)" }}
+              >
+                <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-foreground" />
+              </div>
+            </div>
+
+            {/* Color pill label */}
+            <div className="flex justify-center mt-2 mb-2">
+              <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium text-primary-foreground ${bmiCat.pillColor}`}>
+                {bmiCat.label}
+              </span>
+            </div>
+
+            {/* Context sentence */}
+            <p className="text-xs text-muted-foreground text-center leading-relaxed">
+              {bmiCat.context}
+            </p>
           </div>
-          <div className="rounded-xl bg-card border border-border p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Daily Burn</p>
-            <p className="text-2xl font-bold text-foreground">{tdeeRounded}</p>
-            <span className="text-xs text-muted-foreground">TDEE</span>
-          </div>
-          <div className="rounded-xl bg-card border border-border p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Target</p>
-            <p className="text-2xl font-bold text-primary">{calorieTarget}</p>
-            <span className="text-xs text-muted-foreground">cal/day</span>
+
+          {/* TDEE & Calorie Target row */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl bg-card border border-border p-4 text-center">
+              <p className="text-xs text-muted-foreground mb-1">Daily Burn</p>
+              <p className="text-2xl font-bold text-foreground">{tdeeRounded}</p>
+              <span className="text-xs text-muted-foreground">TDEE</span>
+            </div>
+            <div className="rounded-xl bg-card border border-border p-4 text-center">
+              <p className="text-xs text-muted-foreground mb-1">Target</p>
+              <p className="text-2xl font-bold text-primary">{calorieTarget}</p>
+              <span className="text-xs text-muted-foreground">cal/day</span>
+            </div>
           </div>
         </div>
 
@@ -126,6 +182,7 @@ const YourGoal = () => {
         <h2 className="text-lg font-semibold text-foreground mb-1 font-sans">What's your goal?</h2>
         <p className="text-sm text-muted-foreground mb-4">Select one — we'll set your calories and macros automatically.</p>
 
+        {/* Goal cards — Fitts' Law: min 72px, full width, generous padding */}
         <div className="space-y-3 mb-8">
           {goalOptions.map((goal) => {
             const cal = profile.tdee + goal.calorieDelta;
@@ -134,7 +191,7 @@ const YourGoal = () => {
               <button
                 key={goal.key}
                 onClick={() => setSelectedGoal(goal.key)}
-                className={`w-full rounded-xl border-2 p-5 text-left transition-all ${
+                className={`w-full rounded-xl border-2 px-5 py-5 text-left transition-all min-h-[72px] ${
                   isSelected
                     ? "border-primary bg-primary/10"
                     : "border-border bg-card"

@@ -177,6 +177,9 @@ const FoodPicks = () => {
         household_size: household,
         serving_size: household,
         onboarding_completed: true,
+        unit_preference: profile.unitPreference,
+        weight_kg: profile.weightKg,
+        height_cm: profile.heightCm,
       } as any)
       .eq("id", user.id);
 

@@ -51,6 +51,9 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
             proteinPct: d.protein_pct || 30,
             carbPct: d.carb_pct || 40,
             fatPct: d.fat_pct || 30,
+            unitPreference: d.unit_preference || "imperial",
+            weightKg: d.weight_kg || 0,
+            heightCm: d.height_cm || 0,
           });
           setPreferences({
             mealsSelected: d.meals_selected || [],
