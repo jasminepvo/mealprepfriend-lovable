@@ -73,6 +73,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const authFormRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (user) navigate("/", { replace: true });
