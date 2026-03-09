@@ -87,7 +87,7 @@ COOK TIME: ${cookTimeText}
 USER PROFILE:
 - Target: ${calories} cal/day | Macros: ${proteinPct}P/${carbPct}C/${fatPct}F
 - Servings: ${servingText} | Budget: ${budget}
-- Protein: ${protein} | Carb: ${carb} | Veggie: ${veggie} | Fat: ${fat}
+- Primary proteins (vary across meals): ${protein} | Primary carbs (vary across meals): ${carb} | Primary veggies (vary across meals): ${veggie} | Fat: ${fat}
 - Avoid: ${avoidanceText}
 - Cuisines: ${cuisineText} (vary at meal level, keep core ingredients same)
 - Complexity: ${complexityText}

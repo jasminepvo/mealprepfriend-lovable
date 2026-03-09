@@ -8,31 +8,41 @@ import AppHeader from "@/components/AppHeader";
 const mealOptions = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
 const proteinOptions = [
-  { emoji: "🐔", label: "Chicken Breast" },
-  { emoji: "🍗", label: "Chicken Thigh" },
-  { emoji: "🐟", label: "Salmon" },
-  { emoji: "🐠", label: "Tilapia" },
+  { emoji: "🐔", label: "Chicken" },
+  { emoji: "🐟", label: "Fish (Tilapia)" },
+  { emoji: "🍣", label: "Salmon" },
   { emoji: "🦐", label: "Shrimp" },
   { emoji: "🥩", label: "Steak" },
   { emoji: "🫙", label: "Ground Beef" },
   { emoji: "🦃", label: "Ground Turkey" },
+  { emoji: "🐷", label: "Ground Pork" },
   { emoji: "🥚", label: "Eggs" },
-  { emoji: "🫘", label: "Black Beans" },
-  { emoji: "🧆", label: "Chickpeas" },
   { emoji: "🥓", label: "Turkey Bacon" },
+  { emoji: "🧆", label: "Chickpeas" },
+  { emoji: "🫘", label: "Black Beans" },
+  { emoji: "🥩", label: "Lamb" },
+  { emoji: "🍗", label: "Chicken Thighs" },
+  { emoji: "🐟", label: "Tuna (canned)" },
+  { emoji: "🦞", label: "Cod" },
 ];
 
 const carbOptions = [
-  { emoji: "🥔", label: "Potato" },
+  { emoji: "🥔", label: "White Potato" },
   { emoji: "🍠", label: "Sweet Potato" },
   { emoji: "🍚", label: "White Rice" },
-  { emoji: "🍚", label: "Brown Rice" },
-  { emoji: "🍝", label: "Pasta" },
+  { emoji: "🟤", label: "Brown Rice" },
   { emoji: "🌽", label: "Corn" },
-  { emoji: "🫓", label: "Tortillas" },
-  { emoji: "🥖", label: "Bread" },
-  { emoji: "🥣", label: "Oats" },
-  { emoji: "🫘", label: "Quinoa" },
+  { emoji: "🍝", label: "Pasta" },
+  { emoji: "🍞", label: "Sourdough Bread" },
+  { emoji: "🌾", label: "Oats" },
+  { emoji: "🫘", label: "Lentils" },
+  { emoji: "🥙", label: "Whole Wheat Tortilla" },
+  { emoji: "🍚", label: "Jasmine Rice" },
+  { emoji: "🍚", label: "Basmati Rice" },
+  { emoji: "🟡", label: "Quinoa" },
+  { emoji: "🍞", label: "Whole Wheat Bread" },
+  { emoji: "🌾", label: "Farro" },
+  { emoji: "🟠", label: "Butternut Squash" },
 ];
 
 const veggieOptions = [
@@ -42,12 +52,25 @@ const veggieOptions = [
   { emoji: "🥬", label: "Spinach" },
   { emoji: "🫑", label: "Bell Pepper" },
   { emoji: "🥒", label: "Zucchini" },
-  { emoji: "🍅", label: "Tomato" },
   { emoji: "🧅", label: "Onion" },
-  { emoji: "🍄", label: "Mushroom" },
-  { emoji: "🥗", label: "Mixed Greens" },
+  { emoji: "🍄", label: "Mushrooms" },
+  { emoji: "🥬", label: "Bok Choy" },
+  { emoji: "🥦", label: "Cauliflower" },
+  { emoji: "🍅", label: "Tomato" },
+  { emoji: "🧄", label: "Garlic" },
+  { emoji: "🥑", label: "Asparagus" },
+  { emoji: "🌿", label: "Kale" },
+  { emoji: "🥗", label: "Arugula" },
+  { emoji: "🫛", label: "Sugar Snap Peas" },
+  { emoji: "🧅", label: "Leek" },
+  { emoji: "🟣", label: "Purple Cabbage" },
+  { emoji: "🥗", label: "Brussels Sprouts" },
+  { emoji: "🟠", label: "Butternut Squash" },
+  { emoji: "🍆", label: "Eggplant" },
+  { emoji: "🥬", label: "Swiss Chard" },
+  { emoji: "🟡", label: "Yellow Squash" },
   { emoji: "🌶️", label: "Jalapeño" },
-  { emoji: "🥬", label: "Cabbage" },
+  { emoji: "🫚", label: "Celery" },
 ];
 
 const fatOptions = [
@@ -55,6 +78,14 @@ const fatOptions = [
   { emoji: "🫒", label: "Olive Oil" },
   { emoji: "🥜", label: "Peanut Butter" },
   { emoji: "🧀", label: "Cheese" },
+  { emoji: "🥥", label: "Coconut Oil" },
+  { emoji: "🌰", label: "Almonds" },
+  { emoji: "🌻", label: "Sunflower Butter" },
+  { emoji: "🐟", label: "Fatty Fish (Omega-3)" },
+  { emoji: "🥚", label: "Egg Yolks" },
+  { emoji: "🧈", label: "Ghee" },
+  { emoji: "🌰", label: "Walnuts" },
+  { emoji: "🫘", label: "Tahini" },
 ];
 
 const budgetOptions = [
@@ -70,6 +101,30 @@ const householdOptions = [
   { value: "me_plus_1", emoji: "👫", label: "Me + 1" },
   { value: "family", emoji: "👨‍👩‍👧‍👦", label: "Family of 3–4" },
 ];
+
+interface ToggleCardProps {
+  emoji: string;
+  label: string;
+  selected: boolean;
+  onSelect: () => void;
+}
+
+const ToggleCard = ({ emoji, label, selected, onSelect }: ToggleCardProps) => (
+  <button
+    onClick={onSelect}
+    className={`flex items-center gap-3 rounded-lg border-2 px-4 py-3 text-left transition-all min-h-[48px] ${
+      selected
+        ? "border-primary bg-primary/10"
+        : "border-border bg-card hover:border-primary/30"
+    }`}
+  >
+    <span className="text-xl">{emoji}</span>
+    <span className="text-base font-medium text-foreground flex-1">{label}</span>
+    {selected && (
+      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">✓</span>
+    )}
+  </button>
+);
 
 interface RadioCardProps {
   emoji: string;
@@ -108,6 +163,7 @@ const FoodPicks = () => {
   const [avoidances, setAvoidances] = useState<string[]>([]);
   const [household, setHousehold] = useState("just_me");
   const [saving, setSaving] = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   const toggleSelection = (list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setList((prev) => prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]);
@@ -130,12 +186,12 @@ const FoodPicks = () => {
   const isValid = meals.length >= 2 && proteins.length >= 1 && carbs.length >= 1 && veggies.length >= 1 && fat && budget;
 
   const handleGenerate = async () => {
-    if (!profile || !user) return;
+    setAttempted(true);
+    if (!profile || !user || !isValid) return;
     setSaving(true);
 
     const finalAvoidances = avoidances.filter((a) => a !== "None");
 
-    // Set context
     setPreferences({
       mealsSelected: meals,
       protein: proteins.join(", "),
@@ -152,7 +208,6 @@ const FoodPicks = () => {
     setHouseholdSize(household);
     setOnboardingCompleted(true);
 
-    // Persist to DB
     await supabase
       .from("profiles")
       .update({
@@ -219,40 +274,49 @@ const FoodPicks = () => {
           </div>
         </section>
 
-        {/* Protein */}
+        {/* Protein — multiselect */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your proteins</h2>
           <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
           <div className="grid grid-cols-2 gap-2">
             {proteinOptions.map((o) => (
-              <RadioCard key={o.label} {...o} selected={proteins.includes(o.label)} onSelect={() => toggleSelection(proteins, setProteins, o.label)} />
+              <ToggleCard key={o.label} {...o} selected={proteins.includes(o.label)} onSelect={() => toggleSelection(proteins, setProteins, o.label)} />
             ))}
           </div>
+          {attempted && proteins.length === 0 && (
+            <p className="text-sm text-destructive mt-2">Pick at least one option.</p>
+          )}
         </section>
 
-        {/* Carb */}
+        {/* Carb — multiselect */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your carbs</h2>
           <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
           <div className="grid grid-cols-2 gap-2">
             {carbOptions.map((o) => (
-              <RadioCard key={o.label} {...o} selected={carbs.includes(o.label)} onSelect={() => toggleSelection(carbs, setCarbs, o.label)} />
+              <ToggleCard key={o.label} {...o} selected={carbs.includes(o.label)} onSelect={() => toggleSelection(carbs, setCarbs, o.label)} />
             ))}
           </div>
+          {attempted && carbs.length === 0 && (
+            <p className="text-sm text-destructive mt-2">Pick at least one option.</p>
+          )}
         </section>
 
-        {/* Veggie */}
+        {/* Veggie — multiselect */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your veggies</h2>
           <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
           <div className="grid grid-cols-2 gap-2">
             {veggieOptions.map((o) => (
-              <RadioCard key={o.label} {...o} selected={veggies.includes(o.label)} onSelect={() => toggleSelection(veggies, setVeggies, o.label)} />
+              <ToggleCard key={o.label} {...o} selected={veggies.includes(o.label)} onSelect={() => toggleSelection(veggies, setVeggies, o.label)} />
             ))}
           </div>
+          {attempted && veggies.length === 0 && (
+            <p className="text-sm text-destructive mt-2">Pick at least one option.</p>
+          )}
         </section>
 
-        {/* Fat */}
+        {/* Fat — single select */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your fat source</h2>
           <div className="grid grid-cols-2 gap-2">
