@@ -52,7 +52,7 @@ Rules:
 - Western meals only
 - Make meals simple and batch-friendly for Sunday prep
 - The cook guide should have steps that can be completed in about 3 hours total
-- Include parallel tips so the user can multitask efficiently${avoidanceText}${householdText}${keepMealsText}`;
+- Include parallel tips so the user can multitask efficiently${avoidanceText}${householdText}${keepMealsText}${stapleMeals && stapleMeals.length > 0 ? `\n\nSTAPLE MEALS: Include these specific meals in the plan: ${stapleMeals.join(", ")}. Place them on different days and build the rest of the week around the user's nutrition targets.` : ""}`;
 
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let response: Response | null = null;
