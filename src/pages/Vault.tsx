@@ -75,7 +75,7 @@ const Vault = () => {
         <div className="flex items-center justify-center py-20">
           <span className="text-4xl animate-pulse">⭐</span>
         </div>
-        <BottomTabBar />
+        <FloatingTabBar />
       </div>
     );
   }
