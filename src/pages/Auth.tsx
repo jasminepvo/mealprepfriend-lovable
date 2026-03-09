@@ -29,67 +29,28 @@ const walkthrough = [
     title: "Calculate Your Needs",
     desc: "Enter your stats and the app calculates your daily calorie & macro targets using TDEE science.",
     emoji: "⚖️",
-    mockup: (
-      <div className="space-y-2 text-left text-xs">
-        <div className="flex justify-between rounded bg-muted/60 px-3 py-2"><span>Height</span><span className="text-muted-foreground">175 cm</span></div>
-        <div className="flex justify-between rounded bg-muted/60 px-3 py-2"><span>Weight</span><span className="text-muted-foreground">70 kg</span></div>
-        <div className="flex justify-between rounded bg-muted/60 px-3 py-2"><span>Activity</span><span className="text-muted-foreground">Moderate</span></div>
-        <div className="mt-2 rounded-lg bg-primary/10 px-3 py-2 text-center font-semibold text-primary">TDEE: 2,450 kcal</div>
-      </div>
-    ),
+    screenshot: screenshotGoals,
   },
   {
     step: 2,
     title: "Set Preferences",
     desc: "Mark food avoidances, household size, and dietary style — the AI respects all of it.",
     emoji: "🧑‍🍳",
-    mockup: (
-      <div className="space-y-2 text-left text-xs">
-        {["🥜 Nuts", "🥛 Dairy", "🌾 Gluten"].map((item) => (
-          <div key={item} className="flex items-center gap-2 rounded bg-muted/60 px-3 py-2">
-            <div className="h-4 w-4 rounded border border-primary bg-primary/20" />
-            <span>{item}</span>
-          </div>
-        ))}
-        <div className="flex justify-between rounded bg-muted/60 px-3 py-2"><span>Household</span><span className="text-muted-foreground">2 people</span></div>
-      </div>
-    ),
+    screenshot: screenshotPreferences,
   },
   {
     step: 3,
     title: "Lock & Regenerate Meals",
     desc: "Love a meal? Lock it 🔒 and regenerate only the rest — total control over your week.",
     emoji: "🔄",
-    mockup: (
-      <div className="space-y-1.5 text-left text-xs">
-        <div className="flex items-center gap-2 rounded border-l-2 border-primary bg-primary/5 px-3 py-2">
-          <span>🔒</span><span className="font-medium">Grilled Chicken Bowl</span>
-        </div>
-        <div className="flex items-center gap-2 rounded bg-muted/60 px-3 py-2 opacity-60">
-          <span>🔓</span><span className="italic text-muted-foreground">Regenerating…</span>
-        </div>
-        <div className="flex items-center gap-2 rounded border-l-2 border-primary bg-primary/5 px-3 py-2">
-          <span>🔒</span><span className="font-medium">Salmon & Rice</span>
-        </div>
-      </div>
-    ),
+    screenshot: screenshotMealplan,
   },
   {
     step: 4,
     title: "Grocery List & Cook Guide",
     desc: "Auto-generated grocery list grouped by aisle, plus step-by-step cook guide for each meal.",
     emoji: "🛒",
-    mockup: (
-      <div className="space-y-2 text-left text-xs">
-        <p className="font-semibold text-foreground">Produce</p>
-        {["Broccoli × 2", "Sweet potato × 4", "Spinach × 1 bag"].map((i) => (
-          <div key={i} className="flex items-center gap-2 rounded bg-muted/60 px-3 py-1.5">
-            <div className="h-3.5 w-3.5 rounded border border-input" />
-            <span>{i}</span>
-          </div>
-        ))}
-      </div>
-    ),
+    screenshot: screenshotGrocery,
   },
 ];
 
