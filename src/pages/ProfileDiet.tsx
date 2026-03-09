@@ -109,7 +109,7 @@ const ProfileDiet = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 flex items-center gap-3 bg-card border-b border-border px-6 py-3">
-        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="h-5 w-5 text-foreground" /></button>
+        <button onClick={() => navigate("/meal-plan?sheet=open")} className="p-1"><ArrowLeft className="h-5 w-5 text-foreground" /></button>
         <h1 className="text-lg font-bold text-foreground">Diet & Nutrition</h1>
       </header>
 

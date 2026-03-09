@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/hooks/useTheme";
@@ -10,10 +10,19 @@ import SideSheet from "@/components/SideSheet";
 const AppHeader = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { theme, toggleTheme } = useTheme();
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("sheet") === "open") {
+      setSheetOpen(true);
+      searchParams.delete("sheet");
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     if (!user) return;
