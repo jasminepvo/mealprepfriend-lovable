@@ -19,18 +19,22 @@ export type Database = {
           activity_level: string | null
           age: number | null
           avatar_url: string | null
+          biggest_meal: string | null
           biological_sex: string | null
           bmi: number | null
           bmr: number | null
           carb_choice: string | null
           carb_pct: number | null
+          complexity_level: string | null
           created_at: string
+          cuisine_preferences: string[] | null
           current_weight_lbs: number | null
           display_name: string | null
           fat_choice: string | null
           fat_pct: number | null
           food_avoidances: string[] | null
           goal_weight_lbs: number | null
+          healthy_swaps_enabled: boolean | null
           height_cm: number | null
           height_ft: number | null
           height_in: number | null
@@ -55,18 +59,22 @@ export type Database = {
           activity_level?: string | null
           age?: number | null
           avatar_url?: string | null
+          biggest_meal?: string | null
           biological_sex?: string | null
           bmi?: number | null
           bmr?: number | null
           carb_choice?: string | null
           carb_pct?: number | null
+          complexity_level?: string | null
           created_at?: string
+          cuisine_preferences?: string[] | null
           current_weight_lbs?: number | null
           display_name?: string | null
           fat_choice?: string | null
           fat_pct?: number | null
           food_avoidances?: string[] | null
           goal_weight_lbs?: number | null
+          healthy_swaps_enabled?: boolean | null
           height_cm?: number | null
           height_ft?: number | null
           height_in?: number | null
@@ -91,18 +99,22 @@ export type Database = {
           activity_level?: string | null
           age?: number | null
           avatar_url?: string | null
+          biggest_meal?: string | null
           biological_sex?: string | null
           bmi?: number | null
           bmr?: number | null
           carb_choice?: string | null
           carb_pct?: number | null
+          complexity_level?: string | null
           created_at?: string
+          cuisine_preferences?: string[] | null
           current_weight_lbs?: number | null
           display_name?: string | null
           fat_choice?: string | null
           fat_pct?: number | null
           food_avoidances?: string[] | null
           goal_weight_lbs?: number | null
+          healthy_swaps_enabled?: boolean | null
           height_cm?: number | null
           height_ft?: number | null
           height_in?: number | null

@@ -9,21 +9,45 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { protein, carb, veggie, fat, mealsSelected, calories, proteinPct, carbPct, fatPct, budget, foodAvoidances, householdSize, keepMeals, stapleMeals } = await req.json();
+    const {
+      protein, carb, veggie, fat, mealsSelected, calories, proteinPct, carbPct, fatPct,
+      budget, foodAvoidances, householdSize, keepMeals, stapleMeals,
+      cuisinePreferences, complexityLevel, biggestMeal, healthySwapsEnabled,
+    } = await req.json();
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const avoidanceText = foodAvoidances && foodAvoidances.length > 0
-      ? `\n- STRICTLY avoid these ingredients and anything containing them: ${foodAvoidances.join(", ")}`
-      : "";
+      ? foodAvoidances.join(", ")
+      : "None";
 
-    const householdText = householdSize === "me_plus_1"
-      ? "\n- Scale all portions for 2 people"
+    const servingText = householdSize === "me_plus_1"
+      ? "2 people"
       : householdSize === "family"
-      ? "\n- Scale all portions for a family of 3-4 people"
-      : "\n- Portions for 1 person";
+      ? "a family of 3-4 people"
+      : "1 person";
 
-    // Build keep-meals instruction if user locked some meals
+    const cuisineText = cuisinePreferences && cuisinePreferences.length > 0
+      ? cuisinePreferences.join(", ")
+      : "American (default)";
+
+    let complexityText = "";
+    if (complexityLevel === "super_simple") {
+      complexityText = "Every recipe must use exactly 3 ingredients or fewer (excluding salt, pepper, and water). No marinades, no sauces, no multi-step techniques.";
+    } else if (complexityLevel === "master_chef") {
+      complexityText = "Every recipe uses 8+ ingredients. Bold, layered flavors. Techniques like searing, roasting, reducing are welcome. Meals should feel restaurant-quality.";
+    } else {
+      complexityText = "Every recipe uses 5–8 ingredients. Sauces, marinades, and aromatics are encouraged. Max 3 cooking steps.";
+    }
+
+    const biggestMealText = biggestMeal || "midday";
+
+    const swapText = healthySwapsEnabled !== false
+      ? `For each recipe, add one optional swap_tip field: a single sentence suggesting a lighter or healthier ingredient substitution that preserves the dish's cultural flavor profile. Examples: "Swap soy sauce for coconut aminos to reduce sodium.", "Use Greek yogurt instead of sour cream for more protein.", "Try cauliflower rice instead of white rice to cut carbs." Never remove traditional seasonings — only suggest alternatives, never mandate them.`
+      : "Do not include swap tips. Use traditional seasonings and preparation methods.";
+
+    // Build keep-meals instruction
     let keepMealsText = "";
     if (keepMeals && keepMeals.length > 0) {
       const grouped: Record<string, Array<{ mealIndex: number; meal: any }>> = {};
@@ -33,26 +57,55 @@ serve(async (req) => {
       }
       keepMealsText = `\n\nIMPORTANT — LOCKED MEALS:
 The user has locked certain meals that MUST remain EXACTLY as provided below. Do NOT regenerate or modify these meals.
-Only generate new meals for the UNLOCKED slots. Place the locked meals at their exact indices.
+Only generate new meals for the UNLOCKED slots.
 
 Locked meals by day:
-${JSON.stringify(grouped, null, 2)}
-
-For each day, if a meal index is locked, output that exact meal object unchanged. Only generate fresh meals for the remaining indices.`;
+${JSON.stringify(grouped, null, 2)}`;
     }
 
-    const systemPrompt = `You are a meal prep expert helping busy women meal prep a week of healthy food in one Sunday cooking session. Generate a 7-day meal plan and a Sunday cook guide.
+    const stapleText = stapleMeals && stapleMeals.length > 0
+      ? `\n\nSTAPLE MEALS: Include these specific meals in the plan: ${stapleMeals.join(", ")}. Place them on different days.`
+      : "";
 
-Rules:
-- Use ${protein} as the main protein, ${carb} as the carb, ${veggie} as the veggie, and ${fat} as the fat source
+    const systemPrompt = `You are a meal prep expert and culturally-aware chef. Generate a 7-day meal plan for a home cook.
+
+USER PROFILE:
+- Daily calorie target: ${calories} cal/day
+- Macro split: ${proteinPct}% protein, ${carbPct}% carbs, ${fatPct}% fat
+- Serving size: ${servingText}
+- Weekly budget: ${budget}
+
+INGREDIENTS:
+- Primary protein: ${protein}
+- Primary carb: ${carb}
+- Primary veggie: ${veggie}
+- Fat source: ${fat}
+- Foods to avoid: ${avoidanceText}
+
+CUISINE & STYLE:
+- Preferred cuisines: ${cuisineText}
+- Apply cuisines at the meal level, not the week level. Vary cuisines across days and meals naturally.
+- Keep the core protein and carb the same across cuisines — only the seasoning, sauce, and cooking technique changes.
+  Example: chicken breast can become lemongrass chicken (Vietnamese), chicken parm (Italian), or chicken bulgogi (Korean) — same protein, different cultural preparation.
+
+COMPLEXITY:
+${complexityText}
+
+MEAL BALANCE:
 - Include only these meal types: ${mealsSelected.join(", ")}
-- Target ${calories} calories/day with ${proteinPct}% protein, ${carbPct}% carbs, ${fatPct}% fat
-- Weekly grocery budget: ${budget}
-- Keep recipes to 5 ingredients or less
-- Western meals only
-- Make meals simple and batch-friendly for Sunday prep
+- The user's biggest meal should be ${biggestMealText}.
+- Allocate approximately 40% of daily calories to the biggest meal, 35% to the second meal, and 25% to the lightest meal (or distribute evenly across 4 meals if snack is selected).
+- If a high-calorie meal appears earlier in the day, ensure subsequent meals are lighter to stay within the daily target.
+
+HEALTHY SWAPS:
+${swapText}
+
+RECIPE RULES:
+- All recipes must be batch-cook friendly (can be made in large quantities and stored 3–5 days in the fridge)
+- Prioritize ingredients that overlap across multiple meals to minimize grocery list length
 - The cook guide should have steps that can be completed in about 3 hours total
-- Include parallel tips so the user can multitask efficiently${avoidanceText}${householdText}${keepMealsText}${stapleMeals && stapleMeals.length > 0 ? `\n\nSTAPLE MEALS: Include these specific meals in the plan: ${stapleMeals.join(", ")}. Place them on different days and build the rest of the week around the user's nutrition targets.` : ""}`;
+- Include parallel tips so the user can multitask efficiently
+- Make meals simple and batch-friendly for Sunday prep${keepMealsText}${stapleText}`;
 
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let response: Response | null = null;
@@ -91,12 +144,18 @@ Rules:
                             items: {
                               type: "object",
                               properties: {
+                                meal_type: { type: "string", description: "breakfast, lunch, dinner, or snack" },
                                 name: { type: "string" },
+                                cuisine: { type: "string" },
                                 calories: { type: "number" },
                                 protein_g: { type: "number" },
                                 carb_g: { type: "number" },
                                 fat_g: { type: "number" },
                                 prep_time_min: { type: "number" },
+                                cook_time_min: { type: "number" },
+                                ingredients: { type: "array", items: { type: "string" } },
+                                instructions: { type: "array", items: { type: "string" } },
+                                swap_tip: { type: ["string", "null"] },
                               },
                               required: ["name", "calories", "protein_g", "carb_g", "fat_g", "prep_time_min"],
                               additionalProperties: false,
@@ -112,11 +171,12 @@ Rules:
                       items: {
                         type: "object",
                         properties: {
+                          step: { type: "number" },
                           task: { type: "string" },
                           duration_min: { type: "number" },
-                          parallel_tip: { type: "string" },
+                          parallel_tip: { type: ["string", "null"] },
                         },
-                        required: ["task", "duration_min", "parallel_tip"],
+                        required: ["task", "duration_min"],
                         additionalProperties: false,
                       },
                     },
@@ -133,7 +193,7 @@ Rules:
 
       if (response.ok) break;
       console.error(`Model ${model} failed with status ${response.status}`);
-      if (response.status !== 503) break; // Only retry on 503
+      if (response.status !== 503) break;
     }
 
     if (!response.ok) {
@@ -159,7 +219,7 @@ Rules:
 
     const args = JSON.parse(toolCall.function.arguments);
 
-    // Merge locked meals back to guarantee they're untouched
+    // Merge locked meals back
     if (keepMeals && keepMeals.length > 0) {
       const lockedByDay: Record<string, Record<number, any>> = {};
       for (const km of keepMeals) {
@@ -172,7 +232,6 @@ Rules:
         if (locked) {
           for (const [idxStr, meal] of Object.entries(locked)) {
             const idx = parseInt(idxStr);
-            // Ensure array is long enough
             while (dayPlan.meals.length <= idx) {
               dayPlan.meals.push(dayPlan.meals[dayPlan.meals.length - 1] || meal);
             }

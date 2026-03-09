@@ -96,6 +96,10 @@ const MealPlan = () => {
           proteinPct: profile.proteinPct, carbPct: profile.carbPct, fatPct: profile.fatPct,
           budget: preferences.weeklyBudget, foodAvoidances, householdSize, keepMeals,
           stapleMeals: stapleMeals.length > 0 ? stapleMeals : undefined,
+          cuisinePreferences: preferences.cuisinePreferences,
+          complexityLevel: preferences.complexityLevel,
+          biggestMeal: preferences.biggestMeal,
+          healthySwapsEnabled: preferences.healthySwapsEnabled,
         },
       });
       if (fnError) throw fnError;

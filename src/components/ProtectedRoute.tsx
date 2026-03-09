@@ -62,6 +62,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
             veggie: d.veggie_choice || "",
             fat: d.fat_choice || "",
             weeklyBudget: d.weekly_budget || "",
+            cuisinePreferences: (d as any).cuisine_preferences || [],
+            complexityLevel: (d as any).complexity_level || "home_chef",
+            biggestMeal: (d as any).biggest_meal || "midday",
+            healthySwapsEnabled: (d as any).healthy_swaps_enabled ?? true,
           });
           setFoodAvoidances(d.food_avoidances || []);
           setHouseholdSize(d.household_size || "just_me");
