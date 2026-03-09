@@ -97,11 +97,6 @@ const budgetOptions = [
   { emoji: "💚", label: "$0–50" }, { emoji: "💛", label: "$50–100" }, { emoji: "🧡", label: "$100–200" },
 ];
 const avoidanceOptions = ["None", "Gluten", "Dairy", "Nuts", "Shellfish", "Pork"];
-const householdOptions = [
-  { value: "just_me", emoji: "🧍", label: "Just me" },
-  { value: "me_plus_1", emoji: "👫", label: "Me + 1" },
-  { value: "family", emoji: "👨‍👩‍👧‍👦", label: "Family of 3–4" },
-];
 
 interface ToggleCardProps { emoji: string; label: string; selected: boolean; onSelect: () => void; }
 const ToggleCard = ({ emoji, label, selected, onSelect }: ToggleCardProps) => (
