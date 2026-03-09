@@ -81,7 +81,7 @@ COOK TIME: ${cookTimeText}
 
 USER PROFILE:
 - Target: ${calories} cal/day | Macros: ${proteinPct}P/${carbPct}C/${fatPct}F
-- Servings: ${servingText} | Budget: ${budget}
+- Servings: Generate all recipes as single-serving portions sized for one person only. | Budget: ${budget}
 - Primary proteins (vary across meals): ${protein} | Primary carbs (vary across meals): ${carb} | Primary veggies (vary across meals): ${veggie} | Fat: ${fat}
 - Avoid: ${avoidanceText}
 - Cuisines: ${cuisineText} (vary at meal level, keep core ingredients same)

@@ -327,18 +327,6 @@ const ProfileDiet = () => {
           </div>
         </section>
 
-        {/* Household */}
-        <section className="mb-8">
-          <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Who are you cooking for?</h2>
-          <div className="space-y-3">
-            {householdOptions.map(opt => (
-              <button key={opt.value} onClick={() => setHousehold(opt.value)} className={`w-full flex items-center gap-4 rounded-lg border-2 px-5 py-4 text-left transition-colors ${household === opt.value ? "border-primary bg-primary/10" : "border-border bg-card"}`}>
-                <span className="text-2xl">{opt.emoji}</span>
-                <span className="text-base font-medium text-foreground">{opt.label}</span>
-              </button>
-            ))}
-          </div>
-        </section>
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border px-6 py-4">
