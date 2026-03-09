@@ -11,7 +11,7 @@ serve(async (req) => {
   try {
     const {
       protein, carb, veggie, fat, mealsSelected, calories, proteinPct, carbPct, fatPct,
-      budget, foodAvoidances, householdSize, keepMeals, stapleMeals,
+      budget, foodAvoidances, keepMeals, stapleMeals,
       cuisinePreferences, complexityLevel, biggestMeal, healthySwapsEnabled,
     } = await req.json();
 
