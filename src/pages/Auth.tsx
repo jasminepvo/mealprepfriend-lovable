@@ -161,8 +161,8 @@ const Auth = () => {
                         <p className="font-semibold text-foreground text-sm">{slide.title}</p>
                       </div>
                       <p className="text-muted-foreground text-xs leading-relaxed">{slide.desc}</p>
-                      <div className="rounded-lg border border-border bg-card p-3">
-                        {slide.mockup}
+                      <div className="rounded-lg border border-border overflow-hidden">
+                        <img src={slide.screenshot} alt={slide.title} className="w-full h-auto" />
                       </div>
                     </CardContent>
                   </Card>
