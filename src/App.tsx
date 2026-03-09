@@ -23,8 +23,8 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <MealPrepProvider>
-        <BrowserRouter>
+      <BrowserRouter>
+        <MealPrepProvider>
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
@@ -37,8 +37,8 @@ const App = () => (
             <Route path="/edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-      </MealPrepProvider>
+        </MealPrepProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
