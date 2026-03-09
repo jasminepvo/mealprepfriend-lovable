@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -72,6 +73,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const authFormRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (user) navigate("/", { replace: true });
@@ -127,10 +129,17 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 flex items-center bg-card border-b border-border px-6 py-3">
+      <header className="sticky top-0 z-40 flex items-center justify-between bg-card border-b border-border px-6 py-3">
         <span className="text-lg font-bold text-foreground font-sans">
           🥗 MealPrepFriend
         </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => authFormRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        >
+          Log In
+        </Button>
       </header>
       <div className="mx-auto max-w-2xl px-5 py-10 space-y-10">
         {/* Hero */}
@@ -198,7 +207,7 @@ const Auth = () => {
         </div>
 
         {/* Auth form */}
-        <Card className="border-border/50">
+        <Card ref={authFormRef} className="border-border/50">
           <CardContent className="p-6 space-y-4">
             <div className="text-center">
               <p className="font-semibold text-foreground">
