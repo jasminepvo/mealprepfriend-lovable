@@ -201,7 +201,7 @@ const ProfileDiet = () => {
       biggestMeal, healthySwapsEnabled: healthySwaps,
     });
     setFoodAvoidances(finalAvoidances);
-    setHouseholdSize(household);
+    
 
     setSaving(false);
     setShowRegen(true);
