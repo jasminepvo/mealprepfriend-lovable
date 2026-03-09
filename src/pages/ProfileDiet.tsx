@@ -156,7 +156,7 @@ const ProfileDiet = () => {
         setFat(d.fat_choice || "");
         setBudget(d.weekly_budget || "");
         setAvoidances(d.food_avoidances || []);
-        setHousehold(d.household_size || "just_me");
+        
         setCuisines(d.cuisine_preferences || []);
         setComplexity(d.complexity_level || "home_chef");
         setBiggestMeal(d.biggest_meal || "midday");
