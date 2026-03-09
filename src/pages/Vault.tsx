@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import AppHeader from "@/components/AppHeader";
-import BottomTabBar from "@/components/BottomTabBar";
+import FloatingTabBar from "@/components/FloatingTabBar";
 import { useToast } from "@/hooks/use-toast";
 import {
   Sheet,
@@ -75,7 +75,7 @@ const Vault = () => {
         <div className="flex items-center justify-center py-20">
           <span className="text-4xl animate-pulse">⭐</span>
         </div>
-        <BottomTabBar />
+        <FloatingTabBar />
       </div>
     );
   }
@@ -168,7 +168,7 @@ const Vault = () => {
         </SheetContent>
       </Sheet>
 
-      <BottomTabBar />
+      <FloatingTabBar />
     </div>
   );
 };
