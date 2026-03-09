@@ -4,6 +4,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useMealPrep } from "@/context/MealPrepContext";
 import RegenerationSheet from "@/components/RegenerationSheet";
+import CuisineSelector from "@/components/diet/CuisineSelector";
+import ComplexityLevel from "@/components/diet/ComplexityLevel";
+import MealWeightPreference from "@/components/diet/MealWeightPreference";
+import HealthySwapsToggle from "@/components/diet/HealthySwapsToggle";
 import { ArrowLeft } from "lucide-react";
 
 const mealOptions = ["Breakfast", "Lunch", "Dinner", "Snack"];
@@ -58,6 +62,10 @@ const ProfileDiet = () => {
   const [budget, setBudget] = useState("");
   const [avoidances, setAvoidances] = useState<string[]>([]);
   const [household, setHousehold] = useState("just_me");
+  const [cuisines, setCuisines] = useState<string[]>([]);
+  const [complexity, setComplexity] = useState<"super_simple" | "home_chef" | "master_chef">("home_chef");
+  const [biggestMeal, setBiggestMeal] = useState<"morning" | "midday" | "evening">("midday");
+  const [healthySwaps, setHealthySwaps] = useState(true);
 
   useEffect(() => {
     if (!user) return;
@@ -72,6 +80,10 @@ const ProfileDiet = () => {
         setBudget(d.weekly_budget || "");
         setAvoidances(d.food_avoidances || []);
         setHousehold(d.household_size || "just_me");
+        setCuisines(d.cuisine_preferences || []);
+        setComplexity(d.complexity_level || "home_chef");
+        setBiggestMeal(d.biggest_meal || "midday");
+        setHealthySwaps(d.healthy_swaps_enabled ?? true);
       }
       setLoading(false);
     });
@@ -94,9 +106,15 @@ const ProfileDiet = () => {
       meals_selected: meals, protein_choice: protein, carb_choice: carb, veggie_choice: veggie,
       fat_choice: fat, weekly_budget: budget, food_avoidances: finalAvoidances,
       household_size: household, serving_size: household,
+      cuisine_preferences: cuisines, complexity_level: complexity,
+      biggest_meal: biggestMeal, healthy_swaps_enabled: healthySwaps,
     } as any).eq("id", user.id);
 
-    setPreferences({ mealsSelected: meals, protein, carb, veggie, fat, weeklyBudget: budget });
+    setPreferences({
+      mealsSelected: meals, protein, carb, veggie, fat, weeklyBudget: budget,
+      cuisinePreferences: cuisines, complexityLevel: complexity,
+      biggestMeal, healthySwapsEnabled: healthySwaps,
+    });
     setFoodAvoidances(finalAvoidances);
     setHouseholdSize(household);
 
@@ -114,6 +132,18 @@ const ProfileDiet = () => {
       </header>
 
       <div className="px-6 py-8 pb-28">
+        {/* Cuisine Style */}
+        <CuisineSelector cuisines={cuisines} onChange={setCuisines} />
+
+        {/* Complexity Level */}
+        <ComplexityLevel value={complexity} onChange={setComplexity} />
+
+        {/* Meal Weight Preference */}
+        <MealWeightPreference value={biggestMeal} onChange={setBiggestMeal} />
+
+        {/* Healthy Swaps */}
+        <HealthySwapsToggle value={healthySwaps} onChange={setHealthySwaps} />
+
         {/* Meals */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Which meals do you prep?</h2>
