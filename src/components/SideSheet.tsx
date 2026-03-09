@@ -17,10 +17,10 @@ interface SideSheetProps {
 }
 
 const navItems = [
-  { emoji: "👤", label: "My Profile", path: "/profile/account" },
+  { emoji: "👤", label: "About You", path: "/profile/about" },
   { emoji: "🎯", label: "My Goals", path: "/profile/goals" },
   { emoji: "🥗", label: "Diet & Nutrition", path: "/profile/diet" },
-  { emoji: "⚙️", label: "Account Settings", path: "/profile/about" },
+  { emoji: "⚙️", label: "Profile Settings", path: "/profile/account" },
 ];
 
 const SideSheet = ({ open, onOpenChange, displayName, email }: SideSheetProps) => {
