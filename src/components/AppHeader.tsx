@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -10,10 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut } from "lucide-react";
+import { LogOut, Pencil } from "lucide-react";
 
 const AppHeader = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [displayName, setDisplayName] = useState("");
 
   useEffect(() => {
@@ -29,7 +31,6 @@ const AppHeader = () => {
       if (data?.display_name) {
         setDisplayName(data.display_name);
       } else {
-        // Fallback to email local part
         setDisplayName(user.email?.split("@")[0] ?? "");
       }
     };
@@ -61,6 +62,10 @@ const AppHeader = () => {
             <span className="text-sm">👋 Hi, {firstName}</span>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => navigate("/edit-profile")} className="cursor-pointer">
+            <Pencil className="mr-2 h-4 w-4" />
+            Edit Profile
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={signOut} className="cursor-pointer text-destructive focus:text-destructive">
             <LogOut className="mr-2 h-4 w-4" />
             Log out
