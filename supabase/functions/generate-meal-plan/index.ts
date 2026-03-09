@@ -111,9 +111,10 @@ RULES:
         },
         body: JSON.stringify({
           model,
+          max_tokens: 16384,
           messages: [
             { role: "system", content: systemPrompt },
-            { role: "user", content: "Generate the meal plan and cook guide now. Follow the calorie calculation chain-of-thought strictly. Include day_total fields for each day." },
+            { role: "user", content: "Generate the 7-day meal plan and cook guide now. Include day_total fields." },
           ],
           tools: [
             {
