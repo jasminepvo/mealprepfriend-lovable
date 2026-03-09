@@ -12,6 +12,11 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 
+import screenshotGoals from "@/assets/screenshot-goals.png";
+import screenshotPreferences from "@/assets/screenshot-preferences.png";
+import screenshotMealplan from "@/assets/screenshot-mealplan.png";
+import screenshotGrocery from "@/assets/screenshot-grocery.png";
+
 const features = [
   { emoji: "🎯", title: "Set Your Goals", desc: "Tell us your calorie target and activity level" },
   { emoji: "🥑", title: "Pick Your Foods", desc: "Choose proteins, grains, and veggies you love" },
