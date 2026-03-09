@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import AppHeader from "@/components/AppHeader";
-import BottomTabBar from "@/components/BottomTabBar";
+import FloatingTabBar from "@/components/FloatingTabBar";
 import { useToast } from "@/hooks/use-toast";
 import {
   Sheet,
