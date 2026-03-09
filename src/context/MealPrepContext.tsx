@@ -52,6 +52,10 @@ export interface Meal {
 export interface DayPlan {
   day: string;
   meals: Meal[];
+  day_total_calories?: number;
+  day_total_protein_g?: number;
+  day_total_carb_g?: number;
+  day_total_fat_g?: number;
 }
 
 export interface CookStep {
