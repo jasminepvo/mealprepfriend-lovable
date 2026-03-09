@@ -143,6 +143,10 @@ const FoodPicks = () => {
       veggie: veggies.join(", "),
       fat,
       weeklyBudget: budget,
+      cuisinePreferences: [],
+      complexityLevel: "home_chef",
+      biggestMeal: "midday",
+      healthySwapsEnabled: true,
     });
     setFoodAvoidances(finalAvoidances);
     setHouseholdSize(household);
