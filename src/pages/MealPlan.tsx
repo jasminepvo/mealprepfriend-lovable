@@ -6,12 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 import AppHeader from "@/components/AppHeader";
 import FloatingTabBar from "@/components/FloatingTabBar";
 import SwipeIndicator from "@/components/SwipeIndicator";
-import CookGuideContent from "@/components/CookGuideContent";
-import GroceryListContent from "@/components/GroceryListContent";
-import { Lock, Unlock, RefreshCw, Heart, AlertTriangle } from "lucide-react";
+import { Lock, Unlock, RefreshCw, Heart, AlertTriangle, Info } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Sheet,
   SheetContent,
@@ -28,11 +27,15 @@ const dayColors = [
 const goalEmojis: Record<string, string> = { lose_weight: "🔥", build_muscle: "💪", maintain: "⚖️", gain_weight: "📈" };
 const goalNames: Record<string, string> = { lose_weight: "Lose Weight", build_muscle: "Build Muscle", maintain: "Maintain", gain_weight: "Gain Weight" };
 
+interface GroceryItem { name: string; quantity: string; estimated_price: number; }
+interface GroceryCategory { name: string; emoji: string; items: GroceryItem[]; }
+interface GroceryData { categories: GroceryCategory[]; estimated_total: number; }
+
 const MealPlan = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const { profile, preferences, mealPlan, setMealPlan, setCookGuide, foodAvoidances, householdSize } = useMealPrep();
+  const { profile, preferences, mealPlan, setMealPlan, setCookGuide, cookGuide, groceryList, setGroceryList, foodAvoidances, householdSize } = useMealPrep();
   const [loading, setLoading] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [error, setError] = useState("");
@@ -41,6 +44,11 @@ const MealPlan = () => {
   const [removeTarget, setRemoveTarget] = useState<{ name: string; key: string } | null>(null);
   const [stapleCount, setStapleCount] = useState(0);
   const [showStapleBanner, setShowStapleBanner] = useState(true);
+
+  // Grocery list state
+  const [groceryLoading, setGroceryLoading] = useState(false);
+  const [groceryError, setGroceryError] = useState("");
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
 
   // Swipe carousel state: 0=Cook Guide, 1=This Week, 2=Grocery List
   const [activeScreen, setActiveScreen] = useState(1);
@@ -65,6 +73,13 @@ const MealPlan = () => {
     if (!profile || !preferences) { navigate("/"); return; }
     if (!mealPlan) generatePlan();
   }, []);
+
+  // Auto-generate grocery list when swiping to it
+  useEffect(() => {
+    if (activeScreen === 2 && mealPlan && !groceryList && !groceryLoading) {
+      generateGroceryList();
+    }
+  }, [activeScreen, mealPlan, groceryList]);
 
   const toggleLock = useCallback((day: string, mealIndex: number) => {
     setLockedMeals(prev => {
@@ -122,6 +137,25 @@ const MealPlan = () => {
     } finally { setLoading(false); setRegenerating(false); }
   };
 
+  const generateGroceryList = async () => {
+    if (!mealPlan) return;
+    setGroceryLoading(true); setGroceryError("");
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("generate-grocery-list", { body: { mealPlan, budget: preferences?.weeklyBudget } });
+      if (fnError) throw fnError;
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      if (parsed.error) throw new Error(parsed.error);
+      setGroceryList(parsed as GroceryData);
+    } catch (e: any) {
+      console.error("Grocery list error:", e);
+      setGroceryError("Couldn't generate grocery list. Please try again.");
+    } finally { setGroceryLoading(false); }
+  };
+
+  const toggleGroceryItem = (key: string) => {
+    setCheckedItems(prev => { const next = new Set(prev); if (next.has(key)) next.delete(key); else next.add(key); return next; });
+  };
+
   const toggleFavorite = async (meal: Meal) => {
     if (!user) return;
     const key = meal.name;
@@ -155,7 +189,6 @@ const MealPlan = () => {
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const touchY = e.touches[0].clientY;
-    // Exclude bottom 80px (tab bar zone)
     if (touchY > rect.bottom - 80) return;
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = touchY;
@@ -166,13 +199,11 @@ const MealPlan = () => {
     if (!isSwiping) return;
     const dx = e.touches[0].clientX - touchStartX.current;
     const dy = e.touches[0].clientY - touchStartY.current;
-    // If vertical scrolling dominates, cancel swipe
     if (Math.abs(dy) > Math.abs(dx) && Math.abs(swipeOffset) < 10) {
       setIsSwiping(false);
       setSwipeOffset(0);
       return;
     }
-    // Resist at edges
     if ((activeScreen === 0 && dx > 0) || (activeScreen === 2 && dx < 0)) {
       setSwipeOffset(dx * 0.3);
     } else {
@@ -217,6 +248,15 @@ const MealPlan = () => {
 
   if (!mealPlan) return null;
 
+  // Grocery list computed values
+  const totalItems = groceryList?.categories.reduce((sum, cat) => sum + cat.items.length, 0) ?? 0;
+  const checkedCount = checkedItems.size;
+
+  // Cook guide computed values
+  const cookTotalMinutes = cookGuide?.reduce((sum, s) => sum + s.duration_min, 0) ?? 0;
+  const cookHours = Math.floor(cookTotalMinutes / 60);
+  const cookMins = cookTotalMinutes % 60;
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
@@ -256,7 +296,63 @@ const MealPlan = () => {
         >
           {/* Screen 0: Cook Guide */}
           <div className="w-full shrink-0 px-6 py-4 pb-28" style={{ width: "calc(100% / 3)" }}>
-            <CookGuideContent />
+            {!cookGuide || cookGuide.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <span className="text-5xl mb-4">🗓️</span>
+                <h2 className="text-xl font-bold text-foreground mb-2">No cook guide yet</h2>
+                <p className="text-muted-foreground text-sm max-w-xs">
+                  Generate a meal plan first to see your cook day steps.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <h1 className="text-3xl font-bold text-foreground mb-1">Your Cook Day 🗓️</h1>
+                <p className="text-muted-foreground mb-4">
+                  Follow these steps to prep everything in ~{cookHours}h {cookMins > 0 ? `${cookMins}m` : ""}
+                </p>
+
+                <div className="inline-flex items-center gap-2 rounded-full bg-primary/15 px-4 py-2 mb-6">
+                  <span className="text-sm font-semibold text-foreground">
+                    ⏱ Total: {cookHours}h {cookMins > 0 ? `${cookMins}m` : ""}
+                  </span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="p-0.5 rounded-full hover:bg-primary/20 transition-colors">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="max-w-[280px] text-sm">
+                      <p className="font-semibold mb-1">⏱️ About these times</p>
+                      <p className="text-muted-foreground text-xs leading-relaxed">
+                        Cook times are AI-estimated based on standard prep and cooking times for each recipe.
+                        Your actual time may vary. First-timers may want to add 30–45 extra minutes.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-3">
+                  {cookGuide.map((step, i) => (
+                    <div key={i} className="rounded-xl bg-card border border-border p-4">
+                      <div className="flex items-start gap-3">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                          {i + 1}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground text-base">{step.task}</p>
+                          <div className="flex items-center gap-3 mt-2">
+                            <span className="text-sm text-muted-foreground">⏱ {step.duration_min} min</span>
+                          </div>
+                          {step.parallel_tip && (
+                            <p className="mt-2 text-sm text-muted-foreground italic">💡 {step.parallel_tip}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Screen 1: This Week */}
@@ -368,7 +464,81 @@ const MealPlan = () => {
 
           {/* Screen 2: Grocery List */}
           <div className="w-full shrink-0 px-6 py-4 pb-28" style={{ width: "calc(100% / 3)" }}>
-            <GroceryListContent />
+            {groceryLoading ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <span className="text-5xl mb-6 animate-pulse-gentle">🛒</span>
+                <h2 className="text-2xl font-bold text-foreground mb-2">Building your grocery list...</h2>
+                <p className="text-muted-foreground">Extracting ingredients from your meal plan</p>
+              </div>
+            ) : groceryError ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <p className="text-destructive mb-4">{groceryError}</p>
+                <button onClick={generateGroceryList} className="rounded-lg bg-primary px-6 py-3 text-primary-foreground font-medium">Try Again</button>
+              </div>
+            ) : !groceryList ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <span className="text-5xl mb-4">🛒</span>
+                <h2 className="text-xl font-bold text-foreground mb-2">No grocery list yet</h2>
+                <p className="text-muted-foreground text-sm max-w-xs">
+                  Generate a meal plan first to see your grocery list.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h1 className="text-3xl font-bold text-foreground">Grocery List 🛒</h1>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="p-1 rounded-full hover:bg-muted/50 transition-colors">
+                        <Info className="h-5 w-5 text-muted-foreground" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="max-w-[280px] text-sm">
+                      <p className="font-semibold mb-1">💡 About these prices</p>
+                      <p className="text-muted-foreground text-xs leading-relaxed">
+                        Prices are AI-estimated averages based on typical US retail grocery costs. Actual prices vary by store, brand, and location.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <p className="text-muted-foreground mb-2">{checkedCount} of {totalItems} items checked</p>
+
+                <div className="w-full h-2 rounded-full bg-muted mb-6 overflow-hidden">
+                  <div className="h-full rounded-full bg-secondary transition-all duration-300" style={{ width: totalItems > 0 ? `${(checkedCount / totalItems) * 100}%` : "0%" }} />
+                </div>
+
+                <div className="rounded-xl bg-primary/10 border border-primary/20 px-5 py-4 mb-6 flex items-center justify-between">
+                  <span className="text-sm font-medium text-foreground">Estimated total</span>
+                  <span className="text-xl font-bold text-primary">${groceryList.estimated_total.toFixed(2)}</span>
+                </div>
+
+                <div className="space-y-6">
+                  {groceryList.categories.map(category => (
+                    <section key={category.name}>
+                      <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">{category.emoji} {category.name}</h2>
+                      <div className="space-y-2">
+                        {category.items.map(item => {
+                          const key = `${category.name}-${item.name}`;
+                          const isChecked = checkedItems.has(key);
+                          return (
+                            <button key={key} onClick={() => toggleGroceryItem(key)} className={`w-full flex items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all ${isChecked ? "border-secondary/40 bg-secondary/10 opacity-60" : "border-border bg-card"}`}>
+                              <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors ${isChecked ? "border-secondary bg-secondary" : "border-muted-foreground/40"}`}>
+                                {isChecked && <span className="text-xs text-primary-foreground">✓</span>}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className={`font-medium text-sm ${isChecked ? "line-through text-muted-foreground" : "text-foreground"}`}>{item.name}</p>
+                                <p className="text-xs text-muted-foreground">{item.quantity}</p>
+                              </div>
+                              <span className="text-sm font-medium text-muted-foreground">${item.estimated_price.toFixed(2)}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

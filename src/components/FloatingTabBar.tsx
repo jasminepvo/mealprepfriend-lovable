@@ -35,8 +35,8 @@ const FloatingTabBar = () => {
                   }}
                 />
               )}
-              <span className="relative text-lg">{tab.emoji}</span>
-              <span className="relative text-xs font-medium">{tab.label}</span>
+              <span className="relative" style={{ fontSize: 22, lineHeight: '22px' }}>{tab.emoji}</span>
+              <span className="relative font-medium" style={{ fontSize: 11, marginTop: 2 }}>{tab.label}</span>
             </button>
           );
         })}
