@@ -22,11 +22,6 @@ serve(async (req) => {
       ? foodAvoidances.join(", ")
       : "None";
 
-    const servingText = householdSize === "me_plus_1"
-      ? "2 people"
-      : householdSize === "family"
-      ? "a family of 3-4 people"
-      : "1 person";
 
     const cuisineText = cuisinePreferences && cuisinePreferences.length > 0
       ? cuisinePreferences.join(", ")
