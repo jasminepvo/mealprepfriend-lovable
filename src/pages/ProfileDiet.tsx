@@ -296,8 +296,12 @@ const ProfileDiet = () => {
         {/* Fat — single select */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your fat source</h2>
-          <div className="grid grid-cols-2 gap-2">
-            {fatOptions.map(o => <RadioCard key={o.label} {...o} selected={fat === o.label} onSelect={() => setFat(o.label)} />)}
+          <div className="flex flex-wrap gap-2">
+            {fatOptions.map(o => (
+              <button key={o.label} onClick={() => setFat(o.label)} className={`rounded-full px-2.5 py-3 text-sm font-medium transition-colors min-h-[44px] ${fat === o.label ? "bg-primary text-primary-foreground" : "bg-card border border-border text-foreground"}`}>
+                {o.emoji} {o.label}
+              </button>
+            ))}
           </div>
         </section>
 
