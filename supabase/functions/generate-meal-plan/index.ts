@@ -54,77 +54,87 @@ Rules:
 - The cook guide should have steps that can be completed in about 3 hours total
 - Include parallel tips so the user can multitask efficiently${avoidanceText}${householdText}${keepMealsText}`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: "Generate the meal plan and cook guide now." },
-        ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "generate_meal_plan_and_cook_guide",
-              description: "Generate a structured 7-day meal plan and Sunday cook guide",
-              parameters: {
-                type: "object",
-                properties: {
-                  meal_plan: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        day: { type: "string", description: "Day name like Monday, Tuesday, etc." },
-                        meals: {
-                          type: "array",
-                          items: {
-                            type: "object",
-                            properties: {
-                              name: { type: "string" },
-                              calories: { type: "number" },
-                              protein_g: { type: "number" },
-                              carb_g: { type: "number" },
-                              fat_g: { type: "number" },
-                              prep_time_min: { type: "number" },
+    const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
+    let response: Response | null = null;
+
+    for (const model of models) {
+      console.log(`Trying model: ${model}`);
+      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: "Generate the meal plan and cook guide now." },
+          ],
+          tools: [
+            {
+              type: "function",
+              function: {
+                name: "generate_meal_plan_and_cook_guide",
+                description: "Generate a structured 7-day meal plan and Sunday cook guide",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    meal_plan: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          day: { type: "string", description: "Day name like Monday, Tuesday, etc." },
+                          meals: {
+                            type: "array",
+                            items: {
+                              type: "object",
+                              properties: {
+                                name: { type: "string" },
+                                calories: { type: "number" },
+                                protein_g: { type: "number" },
+                                carb_g: { type: "number" },
+                                fat_g: { type: "number" },
+                                prep_time_min: { type: "number" },
+                              },
+                              required: ["name", "calories", "protein_g", "carb_g", "fat_g", "prep_time_min"],
+                              additionalProperties: false,
                             },
-                            required: ["name", "calories", "protein_g", "carb_g", "fat_g", "prep_time_min"],
-                            additionalProperties: false,
                           },
                         },
+                        required: ["day", "meals"],
+                        additionalProperties: false,
                       },
-                      required: ["day", "meals"],
-                      additionalProperties: false,
+                    },
+                    cook_guide: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          task: { type: "string" },
+                          duration_min: { type: "number" },
+                          parallel_tip: { type: "string" },
+                        },
+                        required: ["task", "duration_min", "parallel_tip"],
+                        additionalProperties: false,
+                      },
                     },
                   },
-                  cook_guide: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        task: { type: "string" },
-                        duration_min: { type: "number" },
-                        parallel_tip: { type: "string" },
-                      },
-                      required: ["task", "duration_min", "parallel_tip"],
-                      additionalProperties: false,
-                    },
-                  },
+                  required: ["meal_plan", "cook_guide"],
+                  additionalProperties: false,
                 },
-                required: ["meal_plan", "cook_guide"],
-                additionalProperties: false,
               },
             },
-          },
-        ],
-        tool_choice: { type: "function", function: { name: "generate_meal_plan_and_cook_guide" } },
-      }),
-    });
+          ],
+          tool_choice: { type: "function", function: { name: "generate_meal_plan_and_cook_guide" } },
+        }),
+      });
+
+      if (response.ok) break;
+      console.error(`Model ${model} failed with status ${response.status}`);
+      if (response.status !== 503) break; // Only retry on 503
+    }
 
     if (!response.ok) {
       const errText = await response.text();
