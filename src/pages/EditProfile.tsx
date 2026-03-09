@@ -34,10 +34,12 @@ const EditProfile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const [unit, setUnit] = useState<"imperial" | "metric">("imperial");
   const [sex, setSex] = useState<"female" | "male">("female");
   const [age, setAge] = useState(30);
   const [heightFt, setHeightFt] = useState("");
   const [heightIn, setHeightIn] = useState("");
+  const [heightCmInput, setHeightCmInput] = useState("");
   const [currentWeight, setCurrentWeight] = useState("");
   const [goalWeight, setGoalWeight] = useState("");
   const [activity, setActivity] = useState<keyof typeof activityMultipliers>("sedentary");
@@ -53,51 +55,101 @@ const EditProfile = () => {
         .single();
       if (data) {
         const d = data as any;
+        const savedUnit = d.unit_preference || "imperial";
+        setUnit(savedUnit);
         setSex(d.biological_sex || "female");
         setAge(d.age || 30);
-        setHeightFt(d.height_ft?.toString() || "");
-        setHeightIn(d.height_in?.toString() || "");
-        setCurrentWeight(d.current_weight_lbs?.toString() || "");
-        setGoalWeight(d.goal_weight_lbs?.toString() || "");
         setActivity(d.activity_level || "sedentary");
         setSelectedGoal(d.selected_goal || "maintain");
+
+        if (savedUnit === "metric") {
+          setCurrentWeight(d.weight_kg ? parseFloat(d.weight_kg).toFixed(1) : "");
+          setGoalWeight(d.goal_weight_lbs ? (parseFloat(d.goal_weight_lbs) * 0.453592).toFixed(1) : "");
+          setHeightCmInput(d.height_cm ? Math.round(parseFloat(d.height_cm)).toString() : "");
+        } else {
+          setCurrentWeight(d.current_weight_lbs?.toString() || "");
+          setGoalWeight(d.goal_weight_lbs?.toString() || "");
+          setHeightFt(d.height_ft?.toString() || "");
+          setHeightIn(d.height_in?.toString() || "");
+        }
       }
       setLoading(false);
     };
     load();
   }, [user]);
 
+  const switchUnit = (newUnit: "imperial" | "metric") => {
+    if (newUnit === unit) return;
+    if (newUnit === "metric") {
+      if (currentWeight) setCurrentWeight((parseFloat(currentWeight) / 2.205).toFixed(1));
+      if (goalWeight) setGoalWeight((parseFloat(goalWeight) / 2.205).toFixed(1));
+      if (heightFt || heightIn) {
+        const totalInches = (parseInt(heightFt || "0") * 12) + parseInt(heightIn || "0");
+        setHeightCmInput(Math.round(totalInches * 2.54).toString());
+      }
+    } else {
+      if (currentWeight) setCurrentWeight((parseFloat(currentWeight) * 2.205).toFixed(1));
+      if (goalWeight) setGoalWeight((parseFloat(goalWeight) * 2.205).toFixed(1));
+      if (heightCmInput) {
+        const totalInches = parseFloat(heightCmInput) / 2.54;
+        setHeightFt(Math.floor(totalInches / 12).toString());
+        setHeightIn(Math.round(totalInches % 12).toString());
+      }
+    }
+    setUnit(newUnit);
+  };
+
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
 
-    const cw = parseFloat(currentWeight);
-    const gw = parseFloat(goalWeight);
-    const ft = parseInt(heightFt);
-    const inches = parseInt(heightIn);
-    const weightKg = cw * 0.453592;
-    const heightCm = ft * 30.48 + inches * 2.54;
-    const totalInches = ft * 12 + inches;
+    const cwDisplay = parseFloat(currentWeight);
+    const gwDisplay = parseFloat(goalWeight);
+
+    let weightKg: number, heightCm: number;
+    if (unit === "imperial") {
+      weightKg = cwDisplay * 0.453592;
+      const ft = parseInt(heightFt);
+      const inches = parseInt(heightIn);
+      heightCm = ft * 30.48 + inches * 2.54;
+    } else {
+      weightKg = cwDisplay;
+      heightCm = parseFloat(heightCmInput);
+    }
 
     const bmr = sex === "male"
       ? 10 * weightKg + 6.25 * heightCm - 5 * age + 5
       : 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
 
     const tdee = Math.round(bmr * activityMultipliers[activity]);
-    const bmi = parseFloat(((cw / (totalInches * totalInches)) * 703).toFixed(1));
+    const heightM = heightCm / 100;
+    const bmi = parseFloat((weightKg / (heightM * heightM)).toFixed(1));
 
     const goal = goalOptions.find((g) => g.key === selectedGoal) || goalOptions[2];
     const targetCalories = tdee + goal.calorieDelta;
+
+    let storeFt: number, storeIn: number;
+    if (unit === "imperial") {
+      storeFt = parseInt(heightFt);
+      storeIn = parseInt(heightIn);
+    } else {
+      const totalIn = heightCm / 2.54;
+      storeFt = Math.floor(totalIn / 12);
+      storeIn = Math.round(totalIn % 12);
+    }
+
+    const cwLbs = unit === "imperial" ? cwDisplay : cwDisplay * 2.205;
+    const gwLbs = unit === "imperial" ? gwDisplay : gwDisplay * 2.205;
 
     await supabase
       .from("profiles")
       .update({
         biological_sex: sex,
         age,
-        height_ft: ft,
-        height_in: inches,
-        current_weight_lbs: cw,
-        goal_weight_lbs: gw,
+        height_ft: storeFt,
+        height_in: storeIn,
+        current_weight_lbs: parseFloat(cwLbs.toFixed(1)),
+        goal_weight_lbs: parseFloat(gwLbs.toFixed(1)),
         activity_level: activity,
         bmi,
         bmr: Math.round(bmr),
@@ -107,16 +159,19 @@ const EditProfile = () => {
         protein_pct: goal.protein,
         carb_pct: goal.carb,
         fat_pct: goal.fat,
+        unit_preference: unit,
+        weight_kg: parseFloat(weightKg.toFixed(2)),
+        height_cm: parseFloat(heightCm.toFixed(1)),
       } as any)
       .eq("id", user.id);
 
     setProfile({
       biologicalSex: sex,
       age,
-      heightFt: ft,
-      heightIn: inches,
-      currentWeight: cw,
-      goalWeight: gw,
+      heightFt: storeFt,
+      heightIn: storeIn,
+      currentWeight: parseFloat(cwLbs.toFixed(1)),
+      goalWeight: parseFloat(gwLbs.toFixed(1)),
       activityLevel: activity,
       bmi,
       bmr: Math.round(bmr),
@@ -126,6 +181,9 @@ const EditProfile = () => {
       proteinPct: goal.protein,
       carbPct: goal.carb,
       fatPct: goal.fat,
+      unitPreference: unit,
+      weightKg: parseFloat(weightKg.toFixed(2)),
+      heightCm: parseFloat(heightCm.toFixed(1)),
     });
     setOnboardingCompleted(true);
 
@@ -141,11 +199,37 @@ const EditProfile = () => {
     );
   }
 
+  const canSave = unit === "imperial"
+    ? currentWeight && goalWeight && heightFt && heightIn
+    : currentWeight && goalWeight && heightCmInput;
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
       <div className="px-6 py-8 pb-28">
         <h1 className="text-3xl font-bold text-foreground mb-8">Edit Profile</h1>
+
+        {/* Unit Toggle */}
+        <section className="mb-8">
+          <div className="grid grid-cols-2 gap-0 rounded-lg border border-border overflow-hidden">
+            <button
+              onClick={() => switchUnit("imperial")}
+              className={`px-4 py-3 text-sm font-semibold transition-colors ${
+                unit === "imperial" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground"
+              }`}
+            >
+              🇺🇸 Imperial
+            </button>
+            <button
+              onClick={() => switchUnit("metric")}
+              className={`px-4 py-3 text-sm font-semibold transition-colors ${
+                unit === "metric" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground"
+              }`}
+            >
+              🌍 Metric
+            </button>
+          </div>
+        </section>
 
         {/* Biological Sex */}
         <section className="mb-8">
@@ -175,21 +259,25 @@ const EditProfile = () => {
         {/* Height */}
         <section className="mb-8">
           <label className="block text-sm font-medium text-foreground mb-3">Height</label>
-          <div className="grid grid-cols-2 gap-3">
-            <input type="number" inputMode="numeric" value={heightFt} onChange={(e) => setHeightFt(e.target.value)} placeholder="ft" className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-            <input type="number" inputMode="numeric" value={heightIn} onChange={(e) => setHeightIn(e.target.value)} placeholder="in" className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-          </div>
+          {unit === "imperial" ? (
+            <div className="grid grid-cols-2 gap-3">
+              <input type="number" inputMode="numeric" value={heightFt} onChange={(e) => setHeightFt(e.target.value)} placeholder="ft" className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+              <input type="number" inputMode="numeric" value={heightIn} onChange={(e) => setHeightIn(e.target.value)} placeholder="in" className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+          ) : (
+            <input type="number" inputMode="numeric" value={heightCmInput} onChange={(e) => setHeightCmInput(e.target.value)} placeholder="cm" className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+          )}
         </section>
 
         {/* Weight */}
         <section className="mb-8">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Current weight (lbs)</label>
+              <label className="block text-sm font-medium text-foreground mb-2">Current weight ({unit === "imperial" ? "lbs" : "kg"})</label>
               <input type="number" inputMode="numeric" value={currentWeight} onChange={(e) => setCurrentWeight(e.target.value)} className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Goal weight (lbs)</label>
+              <label className="block text-sm font-medium text-foreground mb-2">Goal weight ({unit === "imperial" ? "lbs" : "kg"})</label>
               <input type="number" inputMode="numeric" value={goalWeight} onChange={(e) => setGoalWeight(e.target.value)} className="w-full rounded-lg border border-input bg-card px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
           </div>
@@ -240,7 +328,7 @@ const EditProfile = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border px-6 py-4">
         <button
           onClick={handleSave}
-          disabled={saving || !currentWeight || !goalWeight || !heightFt || !heightIn}
+          disabled={saving || !canSave}
           className="w-full rounded-lg bg-primary px-6 py-4 text-lg font-semibold text-primary-foreground shadow-md disabled:opacity-40 active:scale-[0.98] transition-transform"
         >
           {saving ? "Saving..." : "Save Changes"}

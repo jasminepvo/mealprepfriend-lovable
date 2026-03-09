@@ -31,6 +31,7 @@ export type Database = {
           fat_pct: number | null
           food_avoidances: string[] | null
           goal_weight_lbs: number | null
+          height_cm: number | null
           height_ft: number | null
           height_in: number | null
           household_size: string | null
@@ -43,9 +44,11 @@ export type Database = {
           serving_size: string | null
           target_calories: number | null
           tdee: number | null
+          unit_preference: string | null
           updated_at: string
           veggie_choice: string | null
           weekly_budget: string | null
+          weight_kg: number | null
         }
         Insert: {
           activity_level?: string | null
@@ -63,6 +66,7 @@ export type Database = {
           fat_pct?: number | null
           food_avoidances?: string[] | null
           goal_weight_lbs?: number | null
+          height_cm?: number | null
           height_ft?: number | null
           height_in?: number | null
           household_size?: string | null
@@ -75,9 +79,11 @@ export type Database = {
           serving_size?: string | null
           target_calories?: number | null
           tdee?: number | null
+          unit_preference?: string | null
           updated_at?: string
           veggie_choice?: string | null
           weekly_budget?: string | null
+          weight_kg?: number | null
         }
         Update: {
           activity_level?: string | null
@@ -95,6 +101,7 @@ export type Database = {
           fat_pct?: number | null
           food_avoidances?: string[] | null
           goal_weight_lbs?: number | null
+          height_cm?: number | null
           height_ft?: number | null
           height_in?: number | null
           household_size?: string | null
@@ -107,9 +114,11 @@ export type Database = {
           serving_size?: string | null
           target_calories?: number | null
           tdee?: number | null
+          unit_preference?: string | null
           updated_at?: string
           veggie_choice?: string | null
           weekly_budget?: string | null
+          weight_kg?: number | null
         }
         Relationships: []
       }
