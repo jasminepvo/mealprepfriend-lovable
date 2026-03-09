@@ -159,7 +159,7 @@ const Auth = () => {
             <CarouselContent>
               {walkthrough.map((slide) => (
                 <CarouselItem key={slide.step}>
-                  <Card className="border-border/50">
+                  <Card className="border-border/50 bg-warm-sage">
                     <CardContent className="p-5 space-y-3">
                       <div className="flex items-center gap-2">
                         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
