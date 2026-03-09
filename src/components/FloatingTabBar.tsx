@@ -12,16 +12,8 @@ const FloatingTabBar = () => {
   return (
     <nav className="fixed bottom-4 left-1/2 z-30 -translate-x-1/2 safe-area-bottom">
       <div
-        className="flex items-center rounded-full px-2 py-1"
-        style={{
-          width: "70vw",
-          background: "rgba(255, 255, 255, 0.15)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          border: "1px solid rgba(255, 255, 255, 0.3)",
-          boxShadow:
-            "0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4)",
-        }}
+        className="floating-tab-bar flex items-center rounded-full px-2 py-1"
+        style={{ width: "70vw" }}
       >
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path;
