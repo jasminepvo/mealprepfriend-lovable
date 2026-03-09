@@ -41,6 +41,12 @@ export interface Meal {
   carb_g: number;
   fat_g: number;
   prep_time_min: number;
+  cuisine?: string;
+  cook_time_min?: number;
+  ingredients?: string[];
+  instructions?: string[];
+  swap_tip?: string | null;
+  meal_type?: string;
 }
 
 export interface DayPlan {
