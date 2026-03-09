@@ -207,7 +207,7 @@ const Auth = () => {
         </div>
 
         {/* Auth form */}
-        <Card className="border-border/50">
+        <Card ref={authFormRef} className="border-border/50">
           <CardContent className="p-6 space-y-4">
             <div className="text-center">
               <p className="font-semibold text-foreground">
