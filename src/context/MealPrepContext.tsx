@@ -1,11 +1,18 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 export interface UserProfile {
+  biologicalSex: "female" | "male";
+  age: number;
+  heightFt: number;
+  heightIn: number;
   currentWeight: number;
   goalWeight: number;
   activityLevel: "sedentary" | "lightly_active" | "moderately_active" | "very_active";
+  bmi: number;
+  bmr: number;
   tdee: number;
-  recommendedCalories: number;
+  selectedGoal: string;
+  targetCalories: number;
   proteinPct: number;
   carbPct: number;
   fatPct: number;
@@ -65,6 +72,7 @@ interface MealPrepState {
   groceryList: GroceryData | null;
   foodAvoidances: string[];
   householdSize: string;
+  onboardingCompleted: boolean;
   setProfile: (p: UserProfile) => void;
   setPreferences: (p: Preferences) => void;
   setMealPlan: (mp: DayPlan[]) => void;
@@ -72,6 +80,7 @@ interface MealPrepState {
   setGroceryList: (gl: GroceryData) => void;
   setFoodAvoidances: (fa: string[]) => void;
   setHouseholdSize: (hs: string) => void;
+  setOnboardingCompleted: (v: boolean) => void;
   reset: () => void;
 }
 
@@ -85,6 +94,7 @@ export const MealPrepProvider = ({ children }: { children: ReactNode }) => {
   const [groceryList, setGroceryList] = useState<GroceryData | null>(null);
   const [foodAvoidances, setFoodAvoidances] = useState<string[]>([]);
   const [householdSize, setHouseholdSize] = useState("just_me");
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
 
   const reset = () => {
     setProfile(null);
@@ -94,10 +104,11 @@ export const MealPrepProvider = ({ children }: { children: ReactNode }) => {
     setGroceryList(null);
     setFoodAvoidances([]);
     setHouseholdSize("just_me");
+    setOnboardingCompleted(false);
   };
 
   return (
-    <MealPrepContext.Provider value={{ profile, preferences, mealPlan, cookGuide, groceryList, foodAvoidances, householdSize, setProfile, setPreferences, setMealPlan, setCookGuide, setGroceryList, setFoodAvoidances, setHouseholdSize, reset }}>
+    <MealPrepContext.Provider value={{ profile, preferences, mealPlan, cookGuide, groceryList, foodAvoidances, householdSize, onboardingCompleted, setProfile, setPreferences, setMealPlan, setCookGuide, setGroceryList, setFoodAvoidances, setHouseholdSize, setOnboardingCompleted, reset }}>
       {children}
     </MealPrepContext.Provider>
   );

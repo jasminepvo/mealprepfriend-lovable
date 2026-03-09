@@ -16,31 +16,100 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          activity_level: string | null
+          age: number | null
           avatar_url: string | null
+          biological_sex: string | null
+          bmi: number | null
+          bmr: number | null
+          carb_choice: string | null
+          carb_pct: number | null
           created_at: string
+          current_weight_lbs: number | null
           display_name: string | null
+          fat_choice: string | null
+          fat_pct: number | null
           food_avoidances: string[] | null
+          goal_weight_lbs: number | null
+          height_ft: number | null
+          height_in: number | null
           household_size: string | null
           id: string
+          meals_selected: string[] | null
+          onboarding_completed: boolean | null
+          protein_choice: string | null
+          protein_pct: number | null
+          selected_goal: string | null
+          serving_size: string | null
+          target_calories: number | null
+          tdee: number | null
           updated_at: string
+          veggie_choice: string | null
+          weekly_budget: string | null
         }
         Insert: {
+          activity_level?: string | null
+          age?: number | null
           avatar_url?: string | null
+          biological_sex?: string | null
+          bmi?: number | null
+          bmr?: number | null
+          carb_choice?: string | null
+          carb_pct?: number | null
           created_at?: string
+          current_weight_lbs?: number | null
           display_name?: string | null
+          fat_choice?: string | null
+          fat_pct?: number | null
           food_avoidances?: string[] | null
+          goal_weight_lbs?: number | null
+          height_ft?: number | null
+          height_in?: number | null
           household_size?: string | null
           id: string
+          meals_selected?: string[] | null
+          onboarding_completed?: boolean | null
+          protein_choice?: string | null
+          protein_pct?: number | null
+          selected_goal?: string | null
+          serving_size?: string | null
+          target_calories?: number | null
+          tdee?: number | null
           updated_at?: string
+          veggie_choice?: string | null
+          weekly_budget?: string | null
         }
         Update: {
+          activity_level?: string | null
+          age?: number | null
           avatar_url?: string | null
+          biological_sex?: string | null
+          bmi?: number | null
+          bmr?: number | null
+          carb_choice?: string | null
+          carb_pct?: number | null
           created_at?: string
+          current_weight_lbs?: number | null
           display_name?: string | null
+          fat_choice?: string | null
+          fat_pct?: number | null
           food_avoidances?: string[] | null
+          goal_weight_lbs?: number | null
+          height_ft?: number | null
+          height_in?: number | null
           household_size?: string | null
           id?: string
+          meals_selected?: string[] | null
+          onboarding_completed?: boolean | null
+          protein_choice?: string | null
+          protein_pct?: number | null
+          selected_goal?: string | null
+          serving_size?: string | null
+          target_calories?: number | null
+          tdee?: number | null
           updated_at?: string
+          veggie_choice?: string | null
+          weekly_budget?: string | null
         }
         Relationships: []
       }
