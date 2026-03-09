@@ -186,7 +186,7 @@ const ProfileDiet = () => {
       carb_choice: carbs.join(", "),
       veggie_choice: veggies.join(", "),
       fat_choice: fat, weekly_budget: budget, food_avoidances: finalAvoidances,
-      household_size: household, serving_size: household,
+      
       cuisine_preferences: cuisines, complexity_level: complexity,
       biggest_meal: biggestMeal, healthy_swaps_enabled: healthySwaps,
     } as any).eq("id", user.id);
