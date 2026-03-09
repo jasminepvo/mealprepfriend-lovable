@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import AppHeader from "@/components/AppHeader";
 import BottomTabBar from "@/components/BottomTabBar";
-import { Lock, Unlock, RefreshCw, Heart } from "lucide-react";
+import { Lock, Unlock, RefreshCw, Heart, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -239,6 +239,33 @@ const MealPlan = () => {
                     </div>
                   );
                 })}
+              {/* Day total summary */}
+              {(() => {
+                const totalCal = day.day_total_calories ?? day.meals.reduce((s, m) => s + m.calories, 0);
+                const totalP = day.day_total_protein_g ?? day.meals.reduce((s, m) => s + m.protein_g, 0);
+                const totalC = day.day_total_carb_g ?? day.meals.reduce((s, m) => s + m.carb_g, 0);
+                const totalF = day.day_total_fat_g ?? day.meals.reduce((s, m) => s + m.fat_g, 0);
+                const offTarget = profile ? Math.abs(totalCal - profile.targetCalories) > 100 : false;
+                return (
+                  <div className="mt-3 pt-3 border-t border-border/50">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs text-muted-foreground">
+                        Day total: {Math.round(totalCal)} cal · P {Math.round(totalP)}g · C {Math.round(totalC)}g · F {Math.round(totalF)}g
+                      </span>
+                      {offTarget && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5">
+                              <AlertTriangle className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>This day is slightly off target. Tap Regenerate to adjust.</TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
               </div>
             </div>
           ))}
