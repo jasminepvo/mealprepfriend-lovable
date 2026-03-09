@@ -14,6 +14,11 @@ import MealPlan from "./pages/MealPlan";
 import CookGuide from "./pages/CookGuide";
 import GroceryList from "./pages/GroceryList";
 import EditProfile from "./pages/EditProfile";
+import Vault from "./pages/Vault";
+import ProfileAccount from "./pages/ProfileAccount";
+import ProfileAboutYou from "./pages/ProfileAboutYou";
+import ProfileGoals from "./pages/ProfileGoals";
+import ProfileDiet from "./pages/ProfileDiet";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +40,11 @@ const App = () => (
             <Route path="/grocery-list" element={<ProtectedRoute><GroceryList /></ProtectedRoute>} />
             <Route path="/cook-guide" element={<ProtectedRoute><CookGuide /></ProtectedRoute>} />
             <Route path="/edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+            <Route path="/vault" element={<ProtectedRoute><Vault /></ProtectedRoute>} />
+            <Route path="/profile/account" element={<ProtectedRoute><ProfileAccount /></ProtectedRoute>} />
+            <Route path="/profile/about" element={<ProtectedRoute><ProfileAboutYou /></ProtectedRoute>} />
+            <Route path="/profile/goals" element={<ProtectedRoute><ProfileGoals /></ProtectedRoute>} />
+            <Route path="/profile/diet" element={<ProtectedRoute><ProfileDiet /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </MealPrepProvider>

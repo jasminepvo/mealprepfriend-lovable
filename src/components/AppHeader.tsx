@@ -2,24 +2,22 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "@/hooks/useTheme";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LogOut, Pencil } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
+import SideSheet from "@/components/SideSheet";
 
 const AppHeader = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
+    setEmail(user.email || "");
 
     const fetchProfile = async () => {
       const { data } = await supabase
@@ -42,37 +40,48 @@ const AppHeader = () => {
   const initial = firstName.charAt(0).toUpperCase();
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between bg-card border-b border-border px-6 py-3">
-      <span className="text-lg font-bold text-foreground font-sans">
-        🥗 MealPrepFriend
-      </span>
+    <>
+      <header className="sticky top-0 z-40 flex items-center justify-between bg-card border-b border-border px-6 py-3">
+        <button
+          onClick={() => navigate("/meal-plan")}
+          className="text-lg font-bold text-foreground font-sans hover:opacity-80 transition-opacity"
+        >
+          🥗 MealPrepFriend
+        </button>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-muted/50 transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {theme === "light" ? (
+              <Moon className="h-5 w-5 text-foreground" />
+            ) : (
+              <Sun className="h-5 w-5 text-foreground" />
+            )}
+          </button>
+
+          <button
+            onClick={() => setSheetOpen(true)}
+            className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          >
             <Avatar className="h-9 w-9">
               <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
                 {initial}
               </AvatarFallback>
             </Avatar>
           </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuLabel className="font-normal">
-            <span className="text-sm">👋 Hi, {firstName}</span>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => navigate("/edit-profile")} className="cursor-pointer">
-            <Pencil className="mr-2 h-4 w-4" />
-            Edit Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={signOut} className="cursor-pointer text-destructive focus:text-destructive">
-            <LogOut className="mr-2 h-4 w-4" />
-            Log out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </header>
+        </div>
+      </header>
+
+      <SideSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        displayName={displayName}
+        email={email}
+      />
+    </>
   );
 };
 
