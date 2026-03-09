@@ -222,13 +222,24 @@ RULES:
       throw new Error("AI generation failed");
     }
 
-    const responseText = await response.text();
+    const responseText = (response as any).__cachedText || await response.text();
+    const trimmedResponse = responseText.trim();
+    if (!trimmedResponse || trimmedResponse.length < 100) {
+      console.error("AI returned empty response, length:", responseText.length);
+      throw new Error("AI returned an empty response. Please try again.");
+    }
     let result: any;
     try {
-      result = JSON.parse(responseText);
+      result = JSON.parse(trimmedResponse);
     } catch {
-      console.error("Failed to parse AI response, length:", responseText.length, "preview:", responseText.substring(0, 500));
-      throw new Error("AI response was truncated or malformed");
+      console.error("Failed to parse AI response, length:", trimmedResponse.length, "preview:", trimmedResponse.substring(0, 500));
+      throw new Error("AI response was truncated or malformed. Please try again.");
+    }
+
+    // Check for truncation
+    const finishReason = result.choices?.[0]?.finish_reason;
+    if (finishReason === "length") {
+      console.warn("AI response was truncated due to max_tokens limit");
     }
 
     const toolCall = result.choices?.[0]?.message?.tool_calls?.[0];
