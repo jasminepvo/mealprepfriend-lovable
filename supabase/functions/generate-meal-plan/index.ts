@@ -213,11 +213,35 @@ RECIPE RULES:
       throw new Error("AI generation failed");
     }
 
-    const result = await response.json();
+    const responseText = await response.text();
+    let result: any;
+    try {
+      result = JSON.parse(responseText);
+    } catch {
+      console.error("Failed to parse AI response, length:", responseText.length, "preview:", responseText.substring(0, 500));
+      throw new Error("AI response was truncated or malformed");
+    }
+
     const toolCall = result.choices?.[0]?.message?.tool_calls?.[0];
     if (!toolCall) throw new Error("No tool call in response");
 
-    const args = JSON.parse(toolCall.function.arguments);
+    let args: any;
+    try {
+      args = JSON.parse(toolCall.function.arguments);
+    } catch {
+      // Try to repair truncated JSON from tool call arguments
+      let cleaned = toolCall.function.arguments
+        .replace(/,\s*}/g, "}")
+        .replace(/,\s*]/g, "]")
+        .replace(/[\x00-\x1F\x7F]/g, "");
+      // Try to close unclosed arrays/objects
+      const opens = (cleaned.match(/[\[{]/g) || []).length;
+      const closes = (cleaned.match(/[\]}]/g) || []).length;
+      for (let i = 0; i < opens - closes; i++) {
+        cleaned += cleaned.lastIndexOf("[") > cleaned.lastIndexOf("{") ? "]" : "}";
+      }
+      args = JSON.parse(cleaned);
+    }
 
     // Merge locked meals back
     if (keepMeals && keepMeals.length > 0) {
