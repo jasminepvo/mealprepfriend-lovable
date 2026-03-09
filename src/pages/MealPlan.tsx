@@ -16,6 +16,20 @@ const dayColors = [
   "bg-warm-mint",
 ];
 
+const goalEmojis: Record<string, string> = {
+  lose_weight: "🔥",
+  build_muscle: "💪",
+  maintain: "⚖️",
+  gain_weight: "📈",
+};
+
+const goalNames: Record<string, string> = {
+  lose_weight: "Lose Weight",
+  build_muscle: "Build Muscle",
+  maintain: "Maintain",
+  gain_weight: "Gain Weight",
+};
+
 const MealPlan = () => {
   const navigate = useNavigate();
   const { profile, preferences, mealPlan, setMealPlan, setCookGuide, foodAvoidances, householdSize } = useMealPrep();
@@ -38,17 +52,12 @@ const MealPlan = () => {
     setLockedMeals(prev => {
       const next = { ...prev };
       const set = new Set(prev[day] || []);
-      if (set.has(mealIndex)) {
-        set.delete(mealIndex);
-      } else {
-        set.add(mealIndex);
-      }
+      if (set.has(mealIndex)) set.delete(mealIndex);
+      else set.add(mealIndex);
       next[day] = set;
       return next;
     });
   }, []);
-
-  const hasAnyLocked = Object.values(lockedMeals).some(s => s.size > 0);
 
   const buildKeepMeals = () => {
     if (!mealPlan) return undefined;
@@ -57,9 +66,7 @@ const MealPlan = () => {
       const locked = lockedMeals[dayPlan.day];
       if (locked) {
         locked.forEach(idx => {
-          if (dayPlan.meals[idx]) {
-            keep.push({ day: dayPlan.day, mealIndex: idx, meal: dayPlan.meals[idx] });
-          }
+          if (dayPlan.meals[idx]) keep.push({ day: dayPlan.day, mealIndex: idx, meal: dayPlan.meals[idx] });
         });
       }
     });
@@ -69,11 +76,8 @@ const MealPlan = () => {
   const generatePlan = async (keepMeals?: Array<{ day: string; mealIndex: number; meal: Meal }>) => {
     if (!profile || !preferences) return;
     const isRegen = !!keepMeals;
-    if (isRegen) {
-      setRegenerating(true);
-    } else {
-      setLoading(true);
-    }
+    if (isRegen) setRegenerating(true);
+    else setLoading(true);
     setError("");
 
     try {
@@ -84,7 +88,7 @@ const MealPlan = () => {
           veggie: preferences.veggie,
           fat: preferences.fat,
           mealsSelected: preferences.mealsSelected,
-          calories: profile.recommendedCalories,
+          calories: profile.targetCalories,
           proteinPct: profile.proteinPct,
           carbPct: profile.carbPct,
           fatPct: profile.fatPct,
@@ -96,7 +100,6 @@ const MealPlan = () => {
       });
 
       if (fnError) throw fnError;
-
       const parsed = typeof data === "string" ? JSON.parse(data) : data;
       setMealPlan(parsed.meal_plan as DayPlan[]);
       setCookGuide(parsed.cook_guide as any[]);
@@ -110,7 +113,6 @@ const MealPlan = () => {
   };
 
   const isMealLocked = (day: string, idx: number) => lockedMeals[day]?.has(idx) ?? false;
-
   const isMealRegenerating = (day: string, idx: number) => regenerating && !isMealLocked(day, idx);
 
   if (loading) {
@@ -140,6 +142,28 @@ const MealPlan = () => {
     <div className="min-h-screen bg-background">
       <AppHeader />
       <div className="px-6 py-8 pb-28">
+        {/* Profile summary */}
+        {profile && (
+          <div className="rounded-xl bg-card border border-border px-4 py-3 mb-4 flex items-center gap-2 flex-wrap">
+            <span className="text-lg">{goalEmojis[profile.selectedGoal] || "⚖️"}</span>
+            <span className="text-sm font-medium text-foreground">{goalNames[profile.selectedGoal] || "Maintain"}</span>
+            <span className="text-sm text-muted-foreground">·</span>
+            <span className="text-sm text-muted-foreground">{profile.targetCalories} cal/day</span>
+            <span className="text-sm text-muted-foreground">·</span>
+            <span className="text-xs text-muted-foreground">{profile.proteinPct}P {profile.carbPct}C {profile.fatPct}F</span>
+          </div>
+        )}
+
+        {/* Regenerate button */}
+        <button
+          onClick={() => generatePlan(buildKeepMeals())}
+          disabled={regenerating}
+          className="flex items-center justify-center gap-2 rounded-lg border-2 border-primary px-4 py-3 text-sm font-semibold text-primary mb-6 w-full active:scale-[0.98] transition-transform disabled:opacity-50"
+        >
+          <RefreshCw className={`h-4 w-4 ${regenerating ? "animate-spin" : ""}`} />
+          {regenerating ? "Regenerating..." : "Regenerate Plan ✨"}
+        </button>
+
         <div className="flex items-center justify-between mb-1">
           <h1 className="text-3xl font-bold text-foreground">Your Week 🎉</h1>
         </div>
@@ -153,7 +177,6 @@ const MealPlan = () => {
                 {day.meals.map((meal, j) => {
                   const locked = isMealLocked(day.day, j);
                   const shimmer = isMealRegenerating(day.day, j);
-
                   return (
                     <div
                       key={j}
@@ -181,9 +204,7 @@ const MealPlan = () => {
                         onClick={() => toggleLock(day.day, j)}
                         disabled={regenerating}
                         className={`ml-3 p-1.5 rounded-full transition-colors ${
-                          locked
-                            ? "bg-primary/20 text-primary"
-                            : "bg-muted/50 text-muted-foreground hover:text-foreground"
+                          locked ? "bg-primary/20 text-primary" : "bg-muted/50 text-muted-foreground hover:text-foreground"
                         }`}
                         aria-label={locked ? "Unlock meal" : "Lock meal"}
                       >
@@ -198,16 +219,6 @@ const MealPlan = () => {
         </div>
 
         <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border px-6 py-4 flex gap-3">
-          {hasAnyLocked && (
-            <button
-              onClick={() => generatePlan(buildKeepMeals())}
-              disabled={regenerating}
-              className="flex items-center justify-center gap-1.5 rounded-lg border-2 border-accent px-3 py-3 text-sm font-semibold text-accent-foreground active:scale-[0.98] transition-transform disabled:opacity-50"
-            >
-              <RefreshCw className={`h-4 w-4 ${regenerating ? "animate-spin" : ""}`} />
-              {regenerating ? "Regenerating..." : "Regenerate"}
-            </button>
-          )}
           <button
             onClick={() => navigate("/grocery-list")}
             className="flex-1 rounded-lg border-2 border-primary px-4 py-3 text-sm font-semibold text-primary active:scale-[0.98] transition-transform"
