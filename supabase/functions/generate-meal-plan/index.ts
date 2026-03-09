@@ -11,7 +11,7 @@ serve(async (req) => {
   try {
     const {
       protein, carb, veggie, fat, mealsSelected, calories, proteinPct, carbPct, fatPct,
-      budget, foodAvoidances, householdSize, keepMeals, stapleMeals,
+      budget, foodAvoidances, keepMeals, stapleMeals,
       cuisinePreferences, complexityLevel, biggestMeal, healthySwapsEnabled,
     } = await req.json();
 
@@ -22,11 +22,6 @@ serve(async (req) => {
       ? foodAvoidances.join(", ")
       : "None";
 
-    const servingText = householdSize === "me_plus_1"
-      ? "2 people"
-      : householdSize === "family"
-      ? "a family of 3-4 people"
-      : "1 person";
 
     const cuisineText = cuisinePreferences && cuisinePreferences.length > 0
       ? cuisinePreferences.join(", ")
@@ -86,7 +81,7 @@ COOK TIME: ${cookTimeText}
 
 USER PROFILE:
 - Target: ${calories} cal/day | Macros: ${proteinPct}P/${carbPct}C/${fatPct}F
-- Servings: ${servingText} | Budget: ${budget}
+- Servings: Generate all recipes as single-serving portions sized for one person only. | Budget: ${budget}
 - Primary proteins (vary across meals): ${protein} | Primary carbs (vary across meals): ${carb} | Primary veggies (vary across meals): ${veggie} | Fat: ${fat}
 - Avoid: ${avoidanceText}
 - Cuisines: ${cuisineText} (vary at meal level, keep core ingredients same)

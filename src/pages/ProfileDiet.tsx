@@ -97,11 +97,6 @@ const budgetOptions = [
   { emoji: "💚", label: "$0–50" }, { emoji: "💛", label: "$50–100" }, { emoji: "🧡", label: "$100–200" },
 ];
 const avoidanceOptions = ["None", "Gluten", "Dairy", "Nuts", "Shellfish", "Pork"];
-const householdOptions = [
-  { value: "just_me", emoji: "🧍", label: "Just me" },
-  { value: "me_plus_1", emoji: "👫", label: "Me + 1" },
-  { value: "family", emoji: "👨‍👩‍👧‍👦", label: "Family of 3–4" },
-];
 
 interface ToggleCardProps { emoji: string; label: string; selected: boolean; onSelect: () => void; }
 const ToggleCard = ({ emoji, label, selected, onSelect }: ToggleCardProps) => (
@@ -137,7 +132,7 @@ const ProfileDiet = () => {
   const [fat, setFat] = useState("");
   const [budget, setBudget] = useState("");
   const [avoidances, setAvoidances] = useState<string[]>([]);
-  const [household, setHousehold] = useState("just_me");
+  
   const [cuisines, setCuisines] = useState<string[]>([]);
   const [complexity, setComplexity] = useState<"super_simple" | "home_chef" | "master_chef">("home_chef");
   const [biggestMeal, setBiggestMeal] = useState<"morning" | "midday" | "evening">("midday");
@@ -161,7 +156,7 @@ const ProfileDiet = () => {
         setFat(d.fat_choice || "");
         setBudget(d.weekly_budget || "");
         setAvoidances(d.food_avoidances || []);
-        setHousehold(d.household_size || "just_me");
+        
         setCuisines(d.cuisine_preferences || []);
         setComplexity(d.complexity_level || "home_chef");
         setBiggestMeal(d.biggest_meal || "midday");
@@ -191,7 +186,7 @@ const ProfileDiet = () => {
       carb_choice: carbs.join(", "),
       veggie_choice: veggies.join(", "),
       fat_choice: fat, weekly_budget: budget, food_avoidances: finalAvoidances,
-      household_size: household, serving_size: household,
+      
       cuisine_preferences: cuisines, complexity_level: complexity,
       biggest_meal: biggestMeal, healthy_swaps_enabled: healthySwaps,
     } as any).eq("id", user.id);
@@ -206,7 +201,7 @@ const ProfileDiet = () => {
       biggestMeal, healthySwapsEnabled: healthySwaps,
     });
     setFoodAvoidances(finalAvoidances);
-    setHouseholdSize(household);
+    
 
     setSaving(false);
     setShowRegen(true);
@@ -332,18 +327,6 @@ const ProfileDiet = () => {
           </div>
         </section>
 
-        {/* Household */}
-        <section className="mb-8">
-          <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Who are you cooking for?</h2>
-          <div className="space-y-3">
-            {householdOptions.map(opt => (
-              <button key={opt.value} onClick={() => setHousehold(opt.value)} className={`w-full flex items-center gap-4 rounded-lg border-2 px-5 py-4 text-left transition-colors ${household === opt.value ? "border-primary bg-primary/10" : "border-border bg-card"}`}>
-                <span className="text-2xl">{opt.emoji}</span>
-                <span className="text-base font-medium text-foreground">{opt.label}</span>
-              </button>
-            ))}
-          </div>
-        </section>
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border px-6 py-4">
