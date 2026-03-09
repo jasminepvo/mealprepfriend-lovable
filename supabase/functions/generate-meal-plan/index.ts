@@ -230,45 +230,31 @@ RULES:
       }
     }
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("AI gateway error:", response.status, errText);
+    if (!response || !(response as any).__cachedParsed) {
+      console.error("All models failed. Last error:", lastError);
 
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+      if (response && !response.ok) {
+        if (response.status === 429) {
+          return new Response(JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }), {
+            status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        if (response.status === 402) {
+          return new Response(JSON.stringify({ error: "AI credits needed. Please add credits to continue." }), {
+            status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits needed. Please add credits to continue." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw new Error("AI generation failed");
+      throw new Error("AI generation failed after trying all models. Please try again.");
     }
 
-    const responseText = (response as any).__cachedText || await response.text();
-    const trimmedResponse = responseText.trim();
-    if (!trimmedResponse || trimmedResponse.length < 100) {
-      console.error("AI returned empty response, length:", responseText.length);
-      throw new Error("AI returned an empty response. Please try again.");
-    }
-    let result: any;
-    try {
-      result = JSON.parse(trimmedResponse);
-    } catch {
-      console.error("Failed to parse AI response, length:", trimmedResponse.length, "preview:", trimmedResponse.substring(0, 500));
-      throw new Error("AI response was truncated or malformed. Please try again.");
-    }
-
-    // Check for truncation
+    const result = (response as any).__cachedParsed;
     const finishReason = result.choices?.[0]?.finish_reason;
     if (finishReason === "length") {
       console.warn("AI response was truncated due to max_tokens limit");
     }
 
-    const toolCall = result.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall) throw new Error("No tool call in response");
+    const toolCall = result.choices[0].message.tool_calls[0];
 
     let args: any;
     try {
