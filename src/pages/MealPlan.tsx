@@ -117,9 +117,9 @@ const MealPlan = () => {
       // Optimistic add
       setFavoritedMeals(prev => new Set([...prev, key]));
       await supabase.from("vault_meals").insert({
-        user_id: user.id, meal_name: meal.name, calories: meal.calories,
-        protein_g: meal.protein_g, carb_g: meal.carb_g, fat_g: meal.fat_g,
-        prep_time_min: meal.prep_time_min,
+        user_id: user.id, meal_name: meal.name, calories: Math.round(meal.calories),
+        protein_g: Math.round(meal.protein_g * 10) / 10, carb_g: Math.round(meal.carb_g * 10) / 10, fat_g: Math.round(meal.fat_g * 10) / 10,
+        prep_time_min: Math.round(meal.prep_time_min),
         protein_choice: preferences?.protein, carb_choice: preferences?.carb, veggie_choice: preferences?.veggie,
       } as any);
       toast({ title: "❤️ Saved to your Vault", duration: 2000 });
