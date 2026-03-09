@@ -95,7 +95,7 @@ RULES:
 
     const models = [
       "google/gemini-2.5-flash",
-      "google/gemini-3-flash-preview",
+      "google/gemini-2.5-pro",
       "openai/gpt-5-mini",
       "google/gemini-2.5-flash-lite",
     ];
@@ -105,6 +105,61 @@ RULES:
     for (const model of models) {
       console.log(`Trying model: ${model}`);
       try {
+        // Build tool schema - avoid union types for broader compatibility
+        const mealSchema: any = {
+          type: "object",
+          properties: {
+            meal_type: { type: "string", description: "breakfast, lunch, dinner, or snack" },
+            name: { type: "string" },
+            cuisine: { type: "string" },
+            calories: { type: "number" },
+            protein_g: { type: "number" },
+            carb_g: { type: "number" },
+            fat_g: { type: "number" },
+            prep_time_min: { type: "number" },
+            cook_time_min: { type: "number" },
+            ingredients: { type: "array", items: { type: "string" } },
+            instructions: { type: "array", items: { type: "string" } },
+            swap_tip: { type: "string", description: "Optional swap tip or empty string" },
+          },
+          required: ["name", "calories", "protein_g", "carb_g", "fat_g", "prep_time_min"],
+        };
+
+        const toolParams: any = {
+          type: "object",
+          properties: {
+            meal_plan: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  day: { type: "string", description: "Day name like Monday, Tuesday, etc." },
+                  meals: { type: "array", items: mealSchema },
+                  day_total_calories: { type: "number" },
+                  day_total_protein_g: { type: "number" },
+                  day_total_carb_g: { type: "number" },
+                  day_total_fat_g: { type: "number" },
+                },
+                required: ["day", "meals", "day_total_calories", "day_total_protein_g", "day_total_carb_g", "day_total_fat_g"],
+              },
+            },
+            cook_guide: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  step: { type: "number" },
+                  task: { type: "string" },
+                  duration_min: { type: "number" },
+                  parallel_tip: { type: "string", description: "Optional parallel cooking tip or empty string" },
+                },
+                required: ["task", "duration_min"],
+              },
+            },
+          },
+          required: ["meal_plan", "cook_guide"],
+        };
+
         response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -118,95 +173,35 @@ RULES:
               { role: "system", content: systemPrompt },
               { role: "user", content: "Generate the 7-day meal plan and cook guide now. Include day_total fields." },
             ],
-            tools: [
-              {
-                type: "function",
-                function: {
-                  name: "generate_meal_plan_and_cook_guide",
-                  description: "Generate a structured 7-day meal plan and Sunday cook guide with accurate calorie calculations",
-                  parameters: {
-                    type: "object",
-                    properties: {
-                      meal_plan: {
-                        type: "array",
-                        items: {
-                          type: "object",
-                          properties: {
-                            day: { type: "string", description: "Day name like Monday, Tuesday, etc." },
-                            meals: {
-                              type: "array",
-                              items: {
-                                type: "object",
-                                properties: {
-                                  meal_type: { type: "string", description: "breakfast, lunch, dinner, or snack" },
-                                  name: { type: "string" },
-                                  cuisine: { type: "string" },
-                                  calories: { type: "number" },
-                                  protein_g: { type: "number" },
-                                  carb_g: { type: "number" },
-                                  fat_g: { type: "number" },
-                                  prep_time_min: { type: "number" },
-                                  cook_time_min: { type: "number" },
-                                  ingredients: { type: "array", items: { type: "string" } },
-                                  instructions: { type: "array", items: { type: "string" } },
-                                  swap_tip: { type: ["string", "null"] },
-                                },
-                                required: ["name", "calories", "protein_g", "carb_g", "fat_g", "prep_time_min"],
-                                additionalProperties: false,
-                              },
-                            },
-                            day_total_calories: { type: "number", description: "Sum of all meal calories for this day" },
-                            day_total_protein_g: { type: "number", description: "Sum of all meal protein for this day" },
-                            day_total_carb_g: { type: "number", description: "Sum of all meal carbs for this day" },
-                            day_total_fat_g: { type: "number", description: "Sum of all meal fat for this day" },
-                          },
-                          required: ["day", "meals", "day_total_calories", "day_total_protein_g", "day_total_carb_g", "day_total_fat_g"],
-                          additionalProperties: false,
-                        },
-                      },
-                      cook_guide: {
-                        type: "array",
-                        items: {
-                          type: "object",
-                          properties: {
-                            step: { type: "number" },
-                            task: { type: "string" },
-                            duration_min: { type: "number" },
-                            parallel_tip: { type: ["string", "null"] },
-                          },
-                          required: ["task", "duration_min"],
-                          additionalProperties: false,
-                        },
-                      },
-                    },
-                    required: ["meal_plan", "cook_guide"],
-                    additionalProperties: false,
-                  },
-                },
+            tools: [{
+              type: "function",
+              function: {
+                name: "generate_meal_plan_and_cook_guide",
+                description: "Generate a structured 7-day meal plan and Sunday cook guide with accurate calorie calculations",
+                parameters: toolParams,
               },
-            ],
+            }],
             tool_choice: { type: "function", function: { name: "generate_meal_plan_and_cook_guide" } },
           }),
         });
 
         if (!response.ok) {
-          lastError = `Model ${model} failed with status ${response.status}`;
+          const errBody = await response.text();
+          lastError = `Model ${model} failed with status ${response.status}: ${errBody.substring(0, 200)}`;
           console.error(lastError);
-          if (response.status !== 503 && response.status !== 429) break;
+          // Always continue to next model on failure
           continue;
         }
 
         const body = await response.text();
         const trimmed = body.trim();
         
-        // Validate the response has actual tool call content
         if (trimmed.length < 200) {
           lastError = `Model ${model} returned too-short response (${trimmed.length} chars)`;
           console.error(lastError);
           continue;
         }
 
-        // Try to parse and check for tool_calls
         try {
           const parsed = JSON.parse(trimmed);
           const toolCall = parsed.choices?.[0]?.message?.tool_calls?.[0];
@@ -215,8 +210,8 @@ RULES:
             console.error(lastError);
             continue;
           }
-          // Valid response - cache and break
           (response as any).__cachedParsed = parsed;
+          console.log(`Model ${model} succeeded with ${toolCall.function.arguments.length} chars`);
           break;
         } catch (parseErr) {
           lastError = `Model ${model} returned unparseable response: ${trimmed.substring(0, 200)}`;
