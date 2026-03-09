@@ -129,10 +129,17 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 flex items-center bg-card border-b border-border px-6 py-3">
+      <header className="sticky top-0 z-40 flex items-center justify-between bg-card border-b border-border px-6 py-3">
         <span className="text-lg font-bold text-foreground font-sans">
           🥗 MealPrepFriend
         </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => authFormRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        >
+          Log In
+        </Button>
       </header>
       <div className="mx-auto max-w-2xl px-5 py-10 space-y-10">
         {/* Hero */}
