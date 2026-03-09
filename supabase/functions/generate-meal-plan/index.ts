@@ -187,7 +187,20 @@ RULES:
         }),
       });
 
-      if (response.ok) break;
+      if (response.ok) {
+        // Check if the response body is actually valid (not empty whitespace)
+        const cloned = response.clone();
+        const body = await cloned.text();
+        const trimmed = body.trim();
+        if (trimmed.length > 100) {
+          // Store the text so we don't need to re-read
+          (response as any).__cachedText = body;
+          break;
+        }
+        console.error(`Model ${model} returned empty/whitespace response (${body.length} chars)`);
+        // Try next model
+        continue;
+      }
       console.error(`Model ${model} failed with status ${response.status}`);
       if (response.status !== 503) break;
     }
