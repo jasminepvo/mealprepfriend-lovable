@@ -97,7 +97,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // New user on non-onboarding pages: send to onboarding
   if (profileChecked && !onboardingCompleted) {
     const allowedPaths = ["/", "/goals", "/your-goal", "/food-picks"];
-    if (!allowedPaths.includes(location.pathname)) {
+    const profilePaths = ["/profile/account", "/profile/about", "/profile/goals", "/profile/diet", "/edit-profile", "/vault"];
+    if (!allowedPaths.includes(location.pathname) && !profilePaths.includes(location.pathname)) {
       return <Navigate to="/" replace />;
     }
   }
