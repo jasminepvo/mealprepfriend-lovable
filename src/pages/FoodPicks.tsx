@@ -274,13 +274,15 @@ const FoodPicks = () => {
           </div>
         </section>
 
-        {/* Protein — multiselect */}
+        {/* Protein — multiselect pills */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your proteins</h2>
           <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-wrap gap-2">
             {proteinOptions.map((o) => (
-              <ToggleCard key={o.label} {...o} selected={proteins.includes(o.label)} onSelect={() => toggleSelection(proteins, setProteins, o.label)} />
+              <button key={o.label} onClick={() => toggleSelection(proteins, setProteins, o.label)} className={`rounded-full px-2.5 py-3 text-sm font-medium transition-colors min-h-[44px] ${proteins.includes(o.label) ? "bg-primary text-primary-foreground" : "bg-card border border-border text-foreground"}`}>
+                {o.emoji} {o.label}
+              </button>
             ))}
           </div>
           {attempted && proteins.length === 0 && (
@@ -288,13 +290,15 @@ const FoodPicks = () => {
           )}
         </section>
 
-        {/* Carb — multiselect */}
+        {/* Carb — multiselect pills */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your carbs</h2>
           <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-wrap gap-2">
             {carbOptions.map((o) => (
-              <ToggleCard key={o.label} {...o} selected={carbs.includes(o.label)} onSelect={() => toggleSelection(carbs, setCarbs, o.label)} />
+              <button key={o.label} onClick={() => toggleSelection(carbs, setCarbs, o.label)} className={`rounded-full px-2.5 py-3 text-sm font-medium transition-colors min-h-[44px] ${carbs.includes(o.label) ? "bg-primary text-primary-foreground" : "bg-card border border-border text-foreground"}`}>
+                {o.emoji} {o.label}
+              </button>
             ))}
           </div>
           {attempted && carbs.length === 0 && (
@@ -302,13 +306,15 @@ const FoodPicks = () => {
           )}
         </section>
 
-        {/* Veggie — multiselect */}
+        {/* Veggie — multiselect pills */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-3 font-sans">Pick your veggies</h2>
           <p className="text-sm text-muted-foreground mb-3">Select all that you like</p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-wrap gap-2">
             {veggieOptions.map((o) => (
-              <ToggleCard key={o.label} {...o} selected={veggies.includes(o.label)} onSelect={() => toggleSelection(veggies, setVeggies, o.label)} />
+              <button key={o.label} onClick={() => toggleSelection(veggies, setVeggies, o.label)} className={`rounded-full px-2.5 py-3 text-sm font-medium transition-colors min-h-[44px] ${veggies.includes(o.label) ? "bg-primary text-primary-foreground" : "bg-card border border-border text-foreground"}`}>
+                {o.emoji} {o.label}
+              </button>
             ))}
           </div>
           {attempted && veggies.length === 0 && (
