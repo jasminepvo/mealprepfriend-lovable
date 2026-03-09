@@ -10,20 +10,21 @@ const FloatingTabBar = () => {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-4 left-1/2 z-30 -translate-x-1/2 safe-area-bottom">
+    <nav className="fixed bottom-3 left-1/2 z-30 -translate-x-1/2 safe-area-bottom">
       <div
-        className="floating-tab-bar flex items-center rounded-full px-2 py-1"
-        style={{ width: "70vw" }}
+        className="floating-tab-bar flex items-center rounded-full px-2"
+        style={{ width: "70vw", height: 56, paddingTop: 8, paddingBottom: 8 }}
       >
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path;
           return (
-            <button
+             <button
               key={tab.key}
               onClick={() => navigate(tab.path)}
-              className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full py-3 transition-all ${
+              className={`relative flex flex-1 flex-col items-center justify-center rounded-full transition-all ${
                 isActive ? "text-primary" : "text-muted-foreground"
               }`}
+              style={{ height: 40 }}
             >
               {isActive && (
                 <span
@@ -34,8 +35,8 @@ const FloatingTabBar = () => {
                   }}
                 />
               )}
-              <span className="relative text-lg">{tab.emoji}</span>
-              <span className="relative text-xs font-medium">{tab.label}</span>
+              <span className="relative" style={{ fontSize: 22, lineHeight: '22px' }}>{tab.emoji}</span>
+              <span className="relative font-medium" style={{ fontSize: 11, marginTop: 2 }}>{tab.label}</span>
             </button>
           );
         })}
