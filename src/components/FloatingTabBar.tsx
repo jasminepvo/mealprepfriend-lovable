@@ -18,12 +18,13 @@ const FloatingTabBar = () => {
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path;
           return (
-            <button
+             <button
               key={tab.key}
               onClick={() => navigate(tab.path)}
-              className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full py-3 transition-all ${
+              className={`relative flex flex-1 flex-col items-center justify-center rounded-full transition-all ${
                 isActive ? "text-primary" : "text-muted-foreground"
               }`}
+              style={{ height: 40 }}
             >
               {isActive && (
                 <span
