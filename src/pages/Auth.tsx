@@ -15,6 +15,8 @@ import {
 import screenshotGoals from "@/assets/screenshot-goals.png";
 import screenshotPreferences from "@/assets/screenshot-preferences.png";
 import screenshotMealplan from "@/assets/screenshot-mealplan.png";
+import screenshotLockregen from "@/assets/screenshot-lockregen.png";
+import screenshotCookguide from "@/assets/screenshot-cookguide.png";
 import screenshotGrocery from "@/assets/screenshot-grocery.png";
 
 const features = [
