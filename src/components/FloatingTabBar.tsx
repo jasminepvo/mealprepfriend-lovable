@@ -10,10 +10,10 @@ const FloatingTabBar = () => {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-4 left-1/2 z-30 -translate-x-1/2 safe-area-bottom">
+    <nav className="fixed bottom-3 left-1/2 z-30 -translate-x-1/2 safe-area-bottom">
       <div
-        className="floating-tab-bar flex items-center rounded-full px-2 py-1"
-        style={{ width: "70vw" }}
+        className="floating-tab-bar flex items-center rounded-full px-2"
+        style={{ width: "70vw", height: 56, paddingTop: 8, paddingBottom: 8 }}
       >
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path;
