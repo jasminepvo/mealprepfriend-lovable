@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useMealPrep } from "@/context/MealPrepContext";
 import AppHeader from "@/components/AppHeader";
+import { Info } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const CookGuide = () => {
   const navigate = useNavigate();
@@ -22,8 +24,21 @@ const CookGuide = () => {
         <h1 className="text-3xl font-bold text-foreground mb-1">Your Cook Day 🗓️</h1>
         <p className="text-muted-foreground mb-4">Follow these steps to prep everything in ~{hours}h {mins > 0 ? `${mins}m` : ""}</p>
 
-        <div className="inline-flex items-center rounded-full bg-primary/15 px-4 py-2 mb-6">
+        <div className="inline-flex items-center gap-2 rounded-full bg-primary/15 px-4 py-2 mb-6">
           <span className="text-sm font-semibold text-foreground">⏱ Total: {hours}h {mins > 0 ? `${mins}m` : ""}</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="p-0.5 rounded-full hover:bg-primary/20 transition-colors">
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="max-w-[280px] text-sm">
+              <p className="font-semibold mb-1">⏱️ About these times</p>
+              <p className="text-muted-foreground text-xs leading-relaxed">
+                Cook times are AI-estimated based on standard prep and cooking times for each recipe. Your actual time may vary. First-timers may want to add 30–45 extra minutes.
+              </p>
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className="space-y-3">

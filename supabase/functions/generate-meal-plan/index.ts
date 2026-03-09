@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { protein, carb, veggie, fat, mealsSelected, calories, proteinPct, carbPct, fatPct, budget, foodAvoidances, householdSize, keepMeals } = await req.json();
+    const { protein, carb, veggie, fat, mealsSelected, calories, proteinPct, carbPct, fatPct, budget, foodAvoidances, householdSize, keepMeals, stapleMeals } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -52,7 +52,7 @@ Rules:
 - Western meals only
 - Make meals simple and batch-friendly for Sunday prep
 - The cook guide should have steps that can be completed in about 3 hours total
-- Include parallel tips so the user can multitask efficiently${avoidanceText}${householdText}${keepMealsText}`;
+- Include parallel tips so the user can multitask efficiently${avoidanceText}${householdText}${keepMealsText}${stapleMeals && stapleMeals.length > 0 ? `\n\nSTAPLE MEALS: Include these specific meals in the plan: ${stapleMeals.join(", ")}. Place them on different days and build the rest of the week around the user's nutrition targets.` : ""}`;
 
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let response: Response | null = null;

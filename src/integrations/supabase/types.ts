@@ -44,6 +44,7 @@ export type Database = {
           serving_size: string | null
           target_calories: number | null
           tdee: number | null
+          theme_preference: string | null
           unit_preference: string | null
           updated_at: string
           veggie_choice: string | null
@@ -79,6 +80,7 @@ export type Database = {
           serving_size?: string | null
           target_calories?: number | null
           tdee?: number | null
+          theme_preference?: string | null
           unit_preference?: string | null
           updated_at?: string
           veggie_choice?: string | null
@@ -114,11 +116,60 @@ export type Database = {
           serving_size?: string | null
           target_calories?: number | null
           tdee?: number | null
+          theme_preference?: string | null
           unit_preference?: string | null
           updated_at?: string
           veggie_choice?: string | null
           weekly_budget?: string | null
           weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      vault_meals: {
+        Row: {
+          calories: number
+          carb_choice: string | null
+          carb_g: number
+          created_at: string
+          fat_g: number
+          id: string
+          is_staple: boolean
+          meal_name: string
+          prep_time_min: number
+          protein_choice: string | null
+          protein_g: number
+          user_id: string
+          veggie_choice: string | null
+        }
+        Insert: {
+          calories: number
+          carb_choice?: string | null
+          carb_g: number
+          created_at?: string
+          fat_g: number
+          id?: string
+          is_staple?: boolean
+          meal_name: string
+          prep_time_min?: number
+          protein_choice?: string | null
+          protein_g: number
+          user_id: string
+          veggie_choice?: string | null
+        }
+        Update: {
+          calories?: number
+          carb_choice?: string | null
+          carb_g?: number
+          created_at?: string
+          fat_g?: number
+          id?: string
+          is_staple?: boolean
+          meal_name?: string
+          prep_time_min?: number
+          protein_choice?: string | null
+          protein_g?: number
+          user_id?: string
+          veggie_choice?: string | null
         }
         Relationships: []
       }
