@@ -132,7 +132,7 @@ const ProfileDiet = () => {
   const [fat, setFat] = useState("");
   const [budget, setBudget] = useState("");
   const [avoidances, setAvoidances] = useState<string[]>([]);
-  const [household, setHousehold] = useState("just_me");
+  
   const [cuisines, setCuisines] = useState<string[]>([]);
   const [complexity, setComplexity] = useState<"super_simple" | "home_chef" | "master_chef">("home_chef");
   const [biggestMeal, setBiggestMeal] = useState<"morning" | "midday" | "evening">("midday");
