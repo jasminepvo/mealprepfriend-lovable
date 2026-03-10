@@ -335,7 +335,7 @@ const MealPlan = () => {
 
       <button
         onClick={() => navigateScreen(activeScreen + 1)}
-        className="fixed right-0 z-50 flex flex-col items-center justify-center gap-1 border border-border border-r-0"
+        className="edge-arrow fixed right-0 z-50 flex flex-col items-center justify-center gap-1 border border-border border-r-0"
         style={{
           top: "50vh",
           transform: "translateY(-50%)",
