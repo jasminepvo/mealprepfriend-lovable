@@ -1,12 +1,11 @@
-import { useEffect, useState, useCallback, useRef, TouchEvent } from "react";
+import { useEffect, useState, useCallback, useRef, TouchEvent, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMealPrep, DayPlan, Meal } from "@/context/MealPrepContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import AppHeader from "@/components/AppHeader";
 import FloatingTabBar from "@/components/FloatingTabBar";
-import SwipeIndicator from "@/components/SwipeIndicator";
-import { Lock, Unlock, RefreshCw, Heart, AlertTriangle, Info } from "lucide-react";
+import { Lock, Unlock, RefreshCw, Heart, AlertTriangle, Info, ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
