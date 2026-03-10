@@ -289,7 +289,7 @@ const MealPlan = () => {
         <div
           className="flex"
           style={{
-            transform: `translateX(calc(-${activeScreen * 100}% + ${swipeOffset}px))`,
+            transform: `translateX(calc(-${activeScreen * (100 / 3)}% + ${swipeOffset}px))`,
             transition: isSwiping ? "none" : "transform 300ms ease-in-out",
             width: "300%",
           }}
