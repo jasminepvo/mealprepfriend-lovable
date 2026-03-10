@@ -1,12 +1,11 @@
-import { useEffect, useState, useCallback, useRef, TouchEvent } from "react";
+import { useEffect, useState, useCallback, useRef, TouchEvent, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMealPrep, DayPlan, Meal } from "@/context/MealPrepContext";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import AppHeader from "@/components/AppHeader";
 import FloatingTabBar from "@/components/FloatingTabBar";
-import SwipeIndicator from "@/components/SwipeIndicator";
-import { Lock, Unlock, RefreshCw, Heart, AlertTriangle, Info } from "lucide-react";
+import { Lock, Unlock, RefreshCw, Heart, AlertTriangle, Info, ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -57,6 +56,21 @@ const MealPlan = () => {
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const mouseStartX = useRef(0);
+
+  // Swipe tutorial overlay
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialDismissing, setTutorialDismissing] = useState(false);
+  const [arrowPulse, setArrowPulse] = useState(false);
+
+  useEffect(() => {
+    const seen = localStorage.getItem("mealprepfriend_swipe_tutorial_seen");
+    if (!seen) {
+      const timer = setTimeout(() => setShowTutorial(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Load favorites and staple count
   useEffect(() => {
@@ -227,6 +241,41 @@ const MealPlan = () => {
     if (index >= 0 && index <= 2) setActiveScreen(index);
   };
 
+  // Mouse drag handlers
+  const handleMouseDown = (e: MouseEvent) => {
+    mouseStartX.current = e.clientX;
+    setIsDragging(true);
+  };
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const dx = e.clientX - mouseStartX.current;
+    if ((activeScreen === 0 && dx > 0) || (activeScreen === 2 && dx < 0)) {
+      setSwipeOffset(dx * 0.3);
+    } else {
+      setSwipeOffset(dx);
+    }
+  };
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    const threshold = 60;
+    if (swipeOffset < -threshold && activeScreen < 2) setActiveScreen(prev => prev + 1);
+    else if (swipeOffset > threshold && activeScreen > 0) setActiveScreen(prev => prev - 1);
+    setSwipeOffset(0);
+  };
+
+  const dismissTutorial = () => {
+    setTutorialDismissing(true);
+    localStorage.setItem("mealprepfriend_swipe_tutorial_seen", "true");
+    setTimeout(() => {
+      setShowTutorial(false);
+      setTutorialDismissing(false);
+      setArrowPulse(true);
+      setTimeout(() => setArrowPulse(false), 1000);
+    }, 200);
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
@@ -261,30 +310,99 @@ const MealPlan = () => {
     <div className="min-h-screen bg-background">
       <AppHeader />
 
-      {/* Swipe indicator */}
-      <SwipeIndicator activeIndex={activeScreen} onNavigate={navigateScreen} />
+      {/* Fixed edge arrows */}
+      <button
+        onClick={() => navigateScreen(activeScreen - 1)}
+        className="edge-arrow fixed left-0 z-50 flex flex-col items-center justify-center gap-1 border border-border border-l-0"
+        style={{
+          top: "50vh",
+          transform: "translateY(-50%)",
+          width: 36,
+          height: 72,
+          borderRadius: "0 12px 12px 0",
+          backdropFilter: "blur(8px)",
+          boxShadow: "2px 0 12px rgba(0,0,0,0.08)",
+          opacity: activeScreen === 0 ? 0 : 1,
+          pointerEvents: activeScreen === 0 ? "none" : "auto",
+          transition: "opacity 200ms ease, transform 200ms ease",
+          ...(arrowPulse ? { animation: "arrow-pulse 400ms ease 2" } : {}),
+        }}
+        aria-label="Previous screen"
+      >
+        <ChevronLeft className="text-primary/70" style={{ width: 20, height: 20 }} />
+        <span style={{ fontSize: 18 }}>{activeScreen === 2 ? "📅" : "🍳"}</span>
+      </button>
 
-      {/* Edge glows */}
-      {activeScreen < 2 && (
+      <button
+        onClick={() => navigateScreen(activeScreen + 1)}
+        className="edge-arrow fixed right-0 z-50 flex flex-col items-center justify-center gap-1 border border-border border-r-0"
+        style={{
+          top: "50vh",
+          transform: "translateY(-50%)",
+          width: 36,
+          height: 72,
+          borderRadius: "12px 0 0 12px",
+          backdropFilter: "blur(8px)",
+          boxShadow: "-2px 0 12px rgba(0,0,0,0.08)",
+          opacity: activeScreen === 2 ? 0 : 1,
+          pointerEvents: activeScreen === 2 ? "none" : "auto",
+          transition: "opacity 200ms ease, transform 200ms ease",
+          ...(arrowPulse ? { animation: "arrow-pulse 400ms ease 200ms 2" } : {}),
+        }}
+        aria-label="Next screen"
+      >
+        <span style={{ fontSize: 18 }}>{activeScreen === 0 ? "📅" : "🛒"}</span>
+        <ChevronRight className="text-primary/70" style={{ width: 20, height: 20 }} />
+      </button>
+
+      {/* Swipe tutorial overlay */}
+      {showTutorial && (
         <div
-          className="pointer-events-none fixed right-0 top-0 bottom-0 z-10 w-10"
-          style={{ background: "radial-gradient(ellipse at right center, hsl(var(--primary) / 0.15), transparent 70%)" }}
-        />
-      )}
-      {activeScreen > 0 && (
-        <div
-          className="pointer-events-none fixed left-0 top-0 bottom-0 z-10 w-10"
-          style={{ background: "radial-gradient(ellipse at left center, hsl(var(--primary) / 0.15), transparent 70%)" }}
-        />
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center"
+          style={{
+            background: "rgba(0,0,0,0.72)",
+            backdropFilter: "blur(4px)",
+            animation: tutorialDismissing ? "fadeOut 200ms ease forwards" : "fadeIn 300ms ease",
+          }}
+          onClick={dismissTutorial}
+        >
+          <div
+            className="bg-card rounded-3xl text-center"
+            style={{ padding: "32px 24px", maxWidth: 300, width: "85%", boxShadow: "0 24px 48px rgba(0,0,0,0.3)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-center gap-6">
+              <ChevronLeft className="text-muted-foreground" style={{ width: 28, height: 28 }} />
+              <span style={{ fontSize: 32 }}>👆</span>
+              <ChevronRight className="text-muted-foreground" style={{ width: 28, height: 28 }} />
+            </div>
+            <h3 className="font-bold text-foreground mt-4" style={{ fontSize: 18 }}>Swipe to navigate</h3>
+            <p className="text-muted-foreground mt-2 leading-relaxed" style={{ fontSize: 14 }}>
+              Swipe left for your Grocery List 🛒<br />
+              Swipe right for your Cook Guide 🍳
+            </p>
+            <button
+              onClick={dismissTutorial}
+              className="w-full mt-6 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] transition-transform"
+            >
+              Got it! Let's eat 🎉
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Swipeable content area */}
       <div
         ref={contentRef}
         className="overflow-hidden"
+        style={{ cursor: isDragging ? "grabbing" : "grab", userSelect: "none" }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
       >
         <div
           className="flex"
