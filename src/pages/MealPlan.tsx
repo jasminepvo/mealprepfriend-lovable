@@ -241,6 +241,41 @@ const MealPlan = () => {
     if (index >= 0 && index <= 2) setActiveScreen(index);
   };
 
+  // Mouse drag handlers
+  const handleMouseDown = (e: MouseEvent) => {
+    mouseStartX.current = e.clientX;
+    setIsDragging(true);
+  };
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const dx = e.clientX - mouseStartX.current;
+    if ((activeScreen === 0 && dx > 0) || (activeScreen === 2 && dx < 0)) {
+      setSwipeOffset(dx * 0.3);
+    } else {
+      setSwipeOffset(dx);
+    }
+  };
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    const threshold = 60;
+    if (swipeOffset < -threshold && activeScreen < 2) setActiveScreen(prev => prev + 1);
+    else if (swipeOffset > threshold && activeScreen > 0) setActiveScreen(prev => prev - 1);
+    setSwipeOffset(0);
+  };
+
+  const dismissTutorial = () => {
+    setTutorialDismissing(true);
+    localStorage.setItem("mealprepfriend_swipe_tutorial_seen", "true");
+    setTimeout(() => {
+      setShowTutorial(false);
+      setTutorialDismissing(false);
+      setArrowPulse(true);
+      setTimeout(() => setArrowPulse(false), 1000);
+    }, 200);
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
