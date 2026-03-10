@@ -12,8 +12,8 @@ const FloatingTabBar = () => {
   return (
     <nav className="fixed bottom-3 left-1/2 z-30 -translate-x-1/2 safe-area-bottom">
       <div
-        className="floating-tab-bar flex items-center rounded-full px-2"
-        style={{ width: "70vw", height: 56, paddingTop: 8, paddingBottom: 8 }}
+        className="floating-tab-bar flex items-center rounded-full"
+        style={{ width: "70vw", height: 48 }}
       >
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path;
@@ -24,7 +24,7 @@ const FloatingTabBar = () => {
               className={`relative flex flex-1 flex-col items-center justify-center rounded-full transition-all ${
                 isActive ? "text-primary" : "text-muted-foreground"
               }`}
-              style={{ height: 40 }}
+              style={{ height: 48 }}
             >
               {isActive && (
                 <span
@@ -35,8 +35,8 @@ const FloatingTabBar = () => {
                   }}
                 />
               )}
-              <span className="relative" style={{ fontSize: 22, lineHeight: '22px' }}>{tab.emoji}</span>
-              <span className="relative font-medium" style={{ fontSize: 11, marginTop: 2 }}>{tab.label}</span>
+              <span className="relative" style={{ fontSize: 18, lineHeight: '18px' }}>{tab.emoji}</span>
+              <span className="relative font-medium" style={{ fontSize: 10, marginTop: 1 }}>{tab.label}</span>
             </button>
           );
         })}
