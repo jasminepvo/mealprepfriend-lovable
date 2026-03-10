@@ -310,30 +310,101 @@ const MealPlan = () => {
     <div className="min-h-screen bg-background">
       <AppHeader />
 
-      {/* Swipe indicator */}
-      <SwipeIndicator activeIndex={activeScreen} onNavigate={navigateScreen} />
+      {/* Fixed edge arrows */}
+      <button
+        onClick={() => navigateScreen(activeScreen - 1)}
+        className="fixed left-0 z-50 flex flex-col items-center justify-center gap-1 border border-border border-l-0"
+        style={{
+          top: "50vh",
+          transform: "translateY(-50%)",
+          width: 36,
+          height: 72,
+          borderRadius: "0 12px 12px 0",
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(8px)",
+          boxShadow: "2px 0 12px rgba(0,0,0,0.08)",
+          opacity: activeScreen === 0 ? 0 : 1,
+          pointerEvents: activeScreen === 0 ? "none" : "auto",
+          transition: "opacity 200ms ease, transform 200ms ease",
+          ...(arrowPulse ? { animation: "arrow-pulse 400ms ease 2" } : {}),
+        }}
+        aria-label="Previous screen"
+      >
+        <ChevronLeft className="text-primary/70" style={{ width: 20, height: 20 }} />
+        <span style={{ fontSize: 18 }}>{activeScreen === 2 ? "📅" : "🍳"}</span>
+      </button>
 
-      {/* Edge glows */}
-      {activeScreen < 2 && (
+      <button
+        onClick={() => navigateScreen(activeScreen + 1)}
+        className="fixed right-0 z-50 flex flex-col items-center justify-center gap-1 border border-border border-r-0"
+        style={{
+          top: "50vh",
+          transform: "translateY(-50%)",
+          width: 36,
+          height: 72,
+          borderRadius: "12px 0 0 12px",
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(8px)",
+          boxShadow: "-2px 0 12px rgba(0,0,0,0.08)",
+          opacity: activeScreen === 2 ? 0 : 1,
+          pointerEvents: activeScreen === 2 ? "none" : "auto",
+          transition: "opacity 200ms ease, transform 200ms ease",
+          ...(arrowPulse ? { animation: "arrow-pulse 400ms ease 200ms 2" } : {}),
+        }}
+        aria-label="Next screen"
+      >
+        <span style={{ fontSize: 18 }}>{activeScreen === 0 ? "📅" : "🛒"}</span>
+        <ChevronRight className="text-primary/70" style={{ width: 20, height: 20 }} />
+      </button>
+
+      {/* Swipe tutorial overlay */}
+      {showTutorial && (
         <div
-          className="pointer-events-none fixed right-0 top-0 bottom-0 z-10 w-10"
-          style={{ background: "radial-gradient(ellipse at right center, hsl(var(--primary) / 0.15), transparent 70%)" }}
-        />
-      )}
-      {activeScreen > 0 && (
-        <div
-          className="pointer-events-none fixed left-0 top-0 bottom-0 z-10 w-10"
-          style={{ background: "radial-gradient(ellipse at left center, hsl(var(--primary) / 0.15), transparent 70%)" }}
-        />
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center"
+          style={{
+            background: "rgba(0,0,0,0.72)",
+            backdropFilter: "blur(4px)",
+            animation: tutorialDismissing ? "fadeOut 200ms ease forwards" : "fadeIn 300ms ease",
+          }}
+          onClick={dismissTutorial}
+        >
+          <div
+            className="bg-card rounded-3xl text-center"
+            style={{ padding: "32px 24px", maxWidth: 300, width: "85%", boxShadow: "0 24px 48px rgba(0,0,0,0.3)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-center gap-6">
+              <ChevronLeft className="text-muted-foreground" style={{ width: 28, height: 28 }} />
+              <span style={{ fontSize: 32 }}>👆</span>
+              <ChevronRight className="text-muted-foreground" style={{ width: 28, height: 28 }} />
+            </div>
+            <h3 className="font-bold text-foreground mt-4" style={{ fontSize: 18 }}>Swipe to navigate</h3>
+            <p className="text-muted-foreground mt-2 leading-relaxed" style={{ fontSize: 14 }}>
+              Swipe left for your Grocery List 🛒<br />
+              Swipe right for your Cook Guide 🍳
+            </p>
+            <button
+              onClick={dismissTutorial}
+              className="w-full mt-6 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] transition-transform"
+            >
+              Got it! Let's eat 🎉
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Swipeable content area */}
       <div
         ref={contentRef}
         className="overflow-hidden"
+        style={{ cursor: isDragging ? "grabbing" : "grab", userSelect: "none" }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
       >
         <div
           className="flex"
