@@ -342,7 +342,6 @@ const MealPlan = () => {
           width: 36,
           height: 72,
           borderRadius: "12px 0 0 12px",
-          background: "rgba(255,255,255,0.85)",
           backdropFilter: "blur(8px)",
           boxShadow: "-2px 0 12px rgba(0,0,0,0.08)",
           opacity: activeScreen === 2 ? 0 : 1,
