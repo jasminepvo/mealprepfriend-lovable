@@ -56,6 +56,21 @@ const MealPlan = () => {
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const mouseStartX = useRef(0);
+
+  // Swipe tutorial overlay
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialDismissing, setTutorialDismissing] = useState(false);
+  const [arrowPulse, setArrowPulse] = useState(false);
+
+  useEffect(() => {
+    const seen = localStorage.getItem("mealprepfriend_swipe_tutorial_seen");
+    if (!seen) {
+      const timer = setTimeout(() => setShowTutorial(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Load favorites and staple count
   useEffect(() => {
