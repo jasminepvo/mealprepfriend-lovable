@@ -111,10 +111,11 @@ const Auth = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
     });
-    if (error && !error.message?.toLowerCase().includes("cancel")) {
+    if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
